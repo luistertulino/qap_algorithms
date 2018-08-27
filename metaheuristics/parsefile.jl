@@ -8,5 +8,3 @@ function parsefile(file::AbstractString)
 
     return (n, F, D);
 end
-
-parsefile(ARGS[1])
