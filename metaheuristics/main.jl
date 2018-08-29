@@ -1,3 +1,4 @@
+using JuMP, Gurobi;
 
 include("parsefile.jl");
 include("qap_model.jl");
