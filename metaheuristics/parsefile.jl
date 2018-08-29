@@ -1,4 +1,4 @@
-function parsefile(file::AbstractString)
+function parsefile(file::String)
     instance = readdlm(file);
     n = instance[1,1];
     F = instance[2:n+1,1:n];

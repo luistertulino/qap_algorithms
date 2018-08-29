@@ -1,7 +1,9 @@
 using JuMP, Gurobi;
 
+tlimit = 80000.0;
+
 function qap_model(n::Int64, F::Array{Int64, 2}, D::Array{Int64, 2})
-    m = Model(solver=GurobiSolver(TimeLimit=5.0));
+    m = Model(solver=GurobiSolver(TimeLimit=tlimit));
     @variable(m, x[1:n,1:n], category = :Bin);
     for i in 1:n
         @constraint(m, sum(x[i,j] for j in 1:n) == 1)
@@ -21,6 +23,7 @@ function qap_model(n::Int64, F::Array{Int64, 2}, D::Array{Int64, 2})
     obj = getobjectivevalue(m); bound = getobjectivebound(m);
     gap = 100 * abs(bound - obj)/abs(obj);
     gap = ceil(gap,4);
+    time = round(Int64, getsolvetime(m));
     
-    return (obj, gap);
+    return (obj, gap, time);
 end

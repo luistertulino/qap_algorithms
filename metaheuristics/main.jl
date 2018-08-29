@@ -2,10 +2,18 @@
 include("parsefile.jl");
 include("qap_model.jl");
 
-(n, F, D) = parsefile(ARGS[1]);
+files = ["chr15a.dat" "chr15b.dat" "chr18a.dat" "chr20a.dat" "chr25a.dat" "rou12.dat" "rou15.dat" "rou20.dat" "els19.dat" "had12.dat" "had14.dat" "bur26a.dat" "bur26b.dat"];
 
-(obj, gap) = qap_model(n, F, D);
+for f in files
+    file = "instances/" * f;
 
-open("results.txt", "a") do f
-    writedlm(f, [split(args, ".dat")[1] obj gap], " ")
+    (n, F, D) = parsefile(file);
+
+    (obj, gap, time) = qap_model(n, F, D);
+
+    open("results.txt", "a") do results
+        writedlm(results, [split(f, ".dat")[1] obj gap time], " ");
+    end
 end
+
+
