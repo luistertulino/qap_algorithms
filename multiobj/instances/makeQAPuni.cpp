@@ -272,8 +272,8 @@ void print_output()
   {
     for(j=0;j<n_fac;j++)
     {
-      fprintf(f, "%2d ",d_matrix[i][j]);
-      printf("%2d ",d_matrix[i][j]);
+      fprintf(f, "%d ",d_matrix[i][j]);
+      printf("%d ",d_matrix[i][j]);
     }
     fprintf(f, "\n");
     printf("\n");
@@ -287,8 +287,8 @@ void print_output()
 	{
 	  for(j=0;j<n_fac;j++)
 	    {
-        fprintf(f, "%2d ",f_matrix[k][i][j]);
-	      printf("%2d ",f_matrix[k][i][j]);
+        fprintf(f, "%d ",f_matrix[k][i][j]);
+	      printf("%d ",f_matrix[k][i][j]);
 	    }
     fprintf(f, "\n");
 	  printf("\n");

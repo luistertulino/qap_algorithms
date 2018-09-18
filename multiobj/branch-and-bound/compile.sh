@@ -1,0 +1,1 @@
+g++ -std=c++11 main.cpp lib/* -o main
