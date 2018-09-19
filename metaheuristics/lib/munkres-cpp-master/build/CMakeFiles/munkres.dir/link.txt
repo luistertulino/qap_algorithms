@@ -1,0 +1,2 @@
+/usr/bin/ar qc libmunkres.a  CMakeFiles/munkres.dir/src/munkres.cpp.o CMakeFiles/munkres.dir/src/adapters/adapter.cpp.o
+/usr/bin/ranlib libmunkres.a
