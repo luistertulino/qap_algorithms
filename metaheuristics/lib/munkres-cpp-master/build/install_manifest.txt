@@ -1,5 +1,0 @@
-/usr/local/lib/libmunkres.a
-/usr/local/include/munkres/matrix.h
-/usr/local/include/munkres/matrix.cpp
-/usr/local/include/munkres/munkres.h
-/usr/local/include/munkres/adapters/adapter.h

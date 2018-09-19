@@ -1,1 +1,0 @@
-/usr/bin/c++    -std=c++11 -Wall -Wextra   CMakeFiles/munkres.bin.dir/examples/main.cpp.o  -o munkres.bin -rdynamic libmunkres.a 
