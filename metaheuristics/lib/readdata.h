@@ -1,0 +1,160 @@
+#ifndef READDATA_H_
+#define READDATA_H_
+
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+
+#include <sstream>
+#include <iterator>
+
+using std::string;
+using std::vector;
+
+typedef vector< vector<int> > Matrix;
+
+void split_string(std::string &str, std::string &delimiter, std::vector< std::string > &words){
+    // Splits a string based on a delimiter
+
+    int i = 0;
+    size_t pos = str.find(delimiter);
+    std::string buff = "";
+
+    while (pos != std::string::npos) {
+        buff = str.substr(i,pos-i);
+
+        if(!buff.empty()){
+            words.push_back(buff);
+        }
+
+        i = ++pos;
+        pos = str.find(delimiter, pos);
+
+        if (pos == std::string::npos) {
+            buff = str.substr(i,str.length());
+
+            if(!buff.empty()){
+                words.push_back(buff);
+            }
+        }
+    }
+}
+
+void split_string(std::string &str, std::vector< std::string > &words){
+    std::istringstream buf(str);
+    std::istream_iterator<std::string> beg(buf), end;
+
+    words = std::vector<std::string>(beg, end);
+    //std::vector<std::string> tokens(beg, end);
+}
+
+void printdata(int &n_facs, Matrix &dist_mat, Matrix &flow_mat);
+
+int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
+{
+    std::vector< std::string > words;
+    std::string delimiter = " ";
+
+    std::ifstream problem_file(file, std::ios::in);
+
+    if(problem_file.is_open())
+    {
+        string line = "";
+        if (std::getline(problem_file, line, '\n')) // read problem size and num of objectives
+        {            
+            //split_string(line, delimiter, words);
+            split_string(line, words);
+
+            n_facs = std::stoi(words[0], nullptr);
+            std::cout << n_facs << "\n";
+        }
+        else{
+            std::cerr << "error in reading n and k of" << file << " file\n";
+            return -1;
+        }
+
+        /* -------------- Read distance matrix -------------- */
+        dist_mat.resize(n_facs);
+        for (int i = 0; i < n_facs; ++i)
+        {
+            dist_mat[i].resize(n_facs);
+
+            if (std::getline(problem_file, line, '\n')){
+                words.clear();
+                //split_string(line, delimiter, words);
+                split_string(line, words);
+            }
+            else{
+                std::cerr << "error in Dist_Matrix in " << file << " file\n";
+                return -1;
+            }
+
+            for (int j = 0; j < n_facs; ++j)
+            {            
+                int dij = std::stoi(words[j], nullptr);
+                dist_mat[i][j] = dij;                
+                
+            }
+        }
+
+        /* -------------- Read flow matrices -------------- */        
+        flow_mat.resize(n_facs);
+        for (int i = 0; i < n_facs; ++i)
+        {
+            flow_mat[i].resize(n_facs);
+
+            if (std::getline(problem_file, line, '\n')){
+                words.clear();
+                //split_string(line, delimiter, words);
+                split_string(line, words);
+            }
+            else{
+                std::cerr << "error in Flow_Matrix in " << file << " file\n";
+                return -1;
+            }
+
+            for (int j = 0; j < n_facs; ++j)
+            {            
+                int f_ij = std::stoi(words[j], nullptr);
+                flow_mat[i][j] = f_ij;               
+                
+            }
+        }
+        
+    }
+    else{
+        std::cerr << "error in opening " << file << " file\n";
+        return -1;
+    }
+    //printdata(n_facs, dist_mat, flow_mat);
+
+}
+
+// Function just for testing
+void printdata(int &n_facs, Matrix &dist_mat, Matrix &flow_mat){
+    std::cout << n_facs << "\n";
+
+    std::cout << "Dist_Matrix:\n";
+    for (int i = 0; i < n_facs; ++i)
+    {
+        for (int j = 0; j < n_facs; ++j)
+        {
+            std::cout << dist_mat[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+
+    std::cout << "\nFlow matrix:\n";
+
+    for (int i = 0; i < n_facs; ++i)
+    {
+        for (int j = 0; j < n_facs; ++j)
+        {
+            std::cout << flow_mat[i][j] << " ";
+        }
+        std::cout << "\n";
+    }
+}
+
+#endif
