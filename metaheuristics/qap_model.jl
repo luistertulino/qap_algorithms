@@ -14,6 +14,7 @@ function qap_model(n::Int64, F::Array{Int64, 2}, D::Array{Int64, 2})
 
     @expression(m, f, begin
         sum( sum( sum( sum( F[i,j]*D[k,l]*x[i,k]*x[j,l] for l in 1:n) for k in 1:n)  for j in 1:n) for i in 1:n)
+
     end);
 
     @objective(m, Min, f);

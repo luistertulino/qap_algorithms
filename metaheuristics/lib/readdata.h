@@ -67,12 +67,14 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             split_string(line, words);
 
             n_facs = std::stoi(words[0], nullptr);
-            std::cout << n_facs << "\n";
         }
         else{
-            std::cerr << "error in reading n and k of" << file << " file\n";
+            std::cerr << "error in reading n of" << file << " file\n";
             return -1;
         }
+        if (std::getline(problem_file, line, '\n')){
+            if (line == "") std::cout << "linha em branco\n";
+        } 
 
         /* -------------- Read distance matrix -------------- */
         dist_mat.resize(n_facs);
@@ -98,7 +100,11 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             }
         }
 
-        /* -------------- Read flow matrices -------------- */        
+        if (std::getline(problem_file, line, '\n')){
+            if (line == "") std::cout << "linha em branco\n";
+        }
+
+        /* -------------- Read flow matrix -------------- */        
         flow_mat.resize(n_facs);
         for (int i = 0; i < n_facs; ++i)
         {
@@ -121,6 +127,8 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
                 
             }
         }
+
+        problem_file.close();
         
     }
     else{
@@ -129,6 +137,43 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
     }
     //printdata(n_facs, dist_mat, flow_mat);
 
+}
+
+int read_solution(string &file){
+    
+    std::ifstream solution_file(file, std::ios::in);
+
+    if (solution_file.is_open())
+    {
+        string line = "";
+        std::vector< std::string > words;
+        if (std::getline(solution_file, line, '\n')) // read problem size and num of objectives
+        {            
+            //split_string(line, delimiter, words);
+            split_string(line, words);
+
+            int sol = std::stoi(words[1], nullptr);
+            return sol;
+        }
+
+        solution_file.close();
+    }
+    else return -1;
+
+}
+
+void write_results(string &results_file, string &instance, int obj, int sol){
+    std::ofstream outfile;
+    outfile.open(results_file, std::ios::app);
+
+    if (outfile.is_open())
+    {
+        outfile << instance << " " << obj << " ";
+        if (sol != -1)
+        {
+            outfile << sol << "\n";
+        } 
+    }
 }
 
 // Function just for testing
