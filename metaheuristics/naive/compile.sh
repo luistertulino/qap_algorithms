@@ -1,0 +1,1 @@
+g++ -std=c++11 naive.cpp ../lib/hungarian-algorithm/hung.o -o exec
