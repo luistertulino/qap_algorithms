@@ -6,11 +6,10 @@
 #include <vector>
 #include <fstream>
 
+#include "definitions.h"
+
 using std::string;
 using std::vector;
-
-typedef vector< vector<int> > Dist_Matrix;
-typedef vector< vector< vector<int> > > Flow_Matrices;
 
 void split_string(std::string &str, std::string &delimiter, std::vector< std::string > &words){
     // Splits a string based on a delimiter

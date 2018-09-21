@@ -103,6 +103,7 @@ double amp; // relates to the correlation
 double offset; // relates to the correlation
 int max_flow = 100;
 int max_dist = 100;
+int num_inst = 1;
 
 int d_matrix[MAX_N][MAX_N];
 int f_matrix[MAX_K][MAX_N][MAX_N];
@@ -114,7 +115,7 @@ int main(int argc, char *argv[])
   int f1,fk;
   int d1;
   seed = 23453464;
-
+  
   if(argc==2) 
     {
       if(strcmp("-h", argv[1])==0)
@@ -155,6 +156,8 @@ int main(int argc, char *argv[])
 	    max_dist = atoi(argv[i+1]);
 	  else if (strcmp("-s", argv[i])==0)
 	    seed = atol(argv[i+1]);
+    else if (strcmp("-i", argv[i])==0)
+      num_inst = atol(argv[i+1]);
 	}
     }
   if(VERBOSE)
@@ -260,7 +263,7 @@ void print_output()
   FILE *f;
   
   std::stringstream ss;
-  ss << n_fac << "." << n_k << "." << std::fixed << std::setprecision(2) << corr;
+  ss << n_fac << "." << n_k << "." << std::fixed << std::setprecision(2) << corr << "." << num_inst;
   string file = "Ter." + ss.str() + ".in";
 
   //const char* ap = "a";
