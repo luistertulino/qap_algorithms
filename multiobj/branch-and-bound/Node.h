@@ -23,14 +23,16 @@ class Node
 
   public:
     Node(){}
-    Node(int last, set<int> &remaining, vector<int> &partial, int n_f, int n_o){
+    Node(int last, set<int> &remaining, vector<int> &partial, int n_f, int n_o)
+    {
         last_item = last;
         remaining_locations = remaining;
         partial_assignment = partial;
         n_facs = n_f;
         n_objs = n_o;
     }
-    Node(LowerBound &lb, int last, set<int> &remaining, vector<int> &partial, int n_f, int n_o){
+    Node(LowerBound &lb, int last, set<int> &remaining, vector<int> &partial, int n_f, int n_o)
+    {
         lower_bound = lb;
         last_item = last;
         remaining_locations = remaining;
@@ -38,7 +40,8 @@ class Node
         n_facs = n_f;
         n_objs = n_o;
     }
-    Node(Node *n){
+    Node(Node *n)
+    {
         last_item = n->last_item;
         remaining_locations = n->remaining_locations;
         partial_assignment = n->partial_assignment;

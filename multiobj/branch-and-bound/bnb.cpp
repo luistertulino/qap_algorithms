@@ -9,7 +9,8 @@ using std::stack;
 using std::pair;
 
 
-bool check_dominance(vector<int> &objs, list<Solution> &non_dominated_set){
+bool check_dominance(vector<int> &objs, list<Solution> &non_dominated_set)
+{
     for (auto sol : non_dominated_set)
     {
         if (sol.objs <= objs)
@@ -18,7 +19,8 @@ bool check_dominance(vector<int> &objs, list<Solution> &non_dominated_set){
     return true;
 }
 
-pair<int,int> BNB::init(list<Solution> &non_dominated_set){
+pair<int,int> BNB::init(list<Solution> &non_dominated_set)
+{
     int num_nodes = 0; int pruned_nodes = 0;
         // We count how many nodes are generated and how many are pruned
 
@@ -31,14 +33,17 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
     num_nodes++;
 
     /* 
-      On this method, we check the pruning condition before the insertion of a node and after the removal.
+      On this method, we check the pruning condition before the insertion of a node and after its removal.
       This happens because a node can be "prunable" in its creation
       On the other hand, we can insert a non-prunable node on the stack, but when it's removed,
       there can be a solution that dominates the lower bound of that node.
     */
-    /*while(!nodes.empty())
+    while(!nodes.empty())
     {
+        std::cout << "Extract node from stack. ";
         Node *n = nodes.top(); nodes.pop();
+        std::cout << "Extracted node from stack.\n";
+        n->print(); std::cout << "\n";
 
         if(!check_dominance(n->lower_bound, non_dominated_set))
         {
@@ -47,9 +52,11 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
             pruned_nodes++;
             delete n;
             continue;
+            std::cout << "Pruned node\n";
         }
 
         // last_item varies between 0 and n_facs-1.
+        // So the last item assigned before a node makes a viable solutions is n_facs-2
         // When the condition is satisfied, there is only one item to add, so it's not necessary create nodes
         if(n->last_item == n_facs-2)
         {
@@ -59,11 +66,12 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
         }
         else
         {
+            std::cout << "+++++++++++++ create child nodes +++++++++++++\n";
             // In this case, a solution cannot be constructed yet
-
             for (auto j = n->remaining_locations.rbegin(); j != n->remaining_locations.rend(); j++)
             {
-                Node *child = make_node(n_facs, *j, n);
+                std::cout << "location: " << *j << "\n";
+                Node *child = make_node(n_facs, *j, n); child->print();
                 num_nodes += 1;
 
                 if (!check_dominance(child->lower_bound, non_dominated_set))
@@ -77,34 +85,41 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
 
                 nodes.push(child);            
             }
+            std::cout << "+++++++++++++ done create child nodes +++++++++++++\n";
         }
 
         delete n;
-    }*/
+    }
 
     return std::make_pair(num_nodes, pruned_nodes);
 }
 
 void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
 {
+    std::cout << "make solution\n";
     if(n->last_item != n_facs-2)
     {
         std::cout << "Calling make_solution with an innapropriate node.\n";
         if(n->last_item < n_facs-2) std::cout << "Node has not enough assignments yet.\n";
         else std::cout << "Node has more assignments than should have.\n";
+        return;
     }
 
-    Solution s;
+    // The last item is assigned to the last remaining location
+    Solution s(n_facs, n_objs);
     s.permutation = n->partial_assignment;
-    auto item = n->remaining_locations.begin();
-    s.permutation[n_facs-1] = *item;
+    if(s.permutation.size() != n_facs) std::cout << "s.permutation.size() != n_facs\n";
+    auto loc = n->remaining_locations.begin();
+    std::cout << "last loc: " << *loc << "\n";
+    s.permutation[n_facs-1] = *loc; std::cout << "s.permutation[n_facs-1]\n";
     s.compute_objs(*dist_mat, *flow_mats);
+    s.print();
 
     for (auto it_sol = non_dominated_set.begin(); it_sol != non_dominated_set.end(); it_sol++ )
     {
         if (s.objs == it_sol->objs)
         {
-            // The solutions have same objective, so we can keep both of them, a priori
+            // The solutions have same objective vector, so we can keep both of them, a priori
             continue;
         }
         else if (s.objs <= it_sol->objs)
@@ -112,7 +127,7 @@ void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
             // The new solution dominates (they are different) a solution from set
             // The solution from set must be removed
             it_sol = non_dominated_set.erase(it_sol); it_sol--; 
-                /* The method will return the next element, and the for will move one more element,
+                /* The erase method returns the next element, and the for will move one more element,
                    so we need to move back 
                 */
         }
@@ -123,7 +138,7 @@ void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
         }
     }
 
-    // If the new solution was not discarded during for, it must be inserted in the non-dominated set
+    // If the new solution was not discarded during for-loop, it must be inserted in the non-dominated set
     non_dominated_set.push_back(s);
 }
 
@@ -134,10 +149,14 @@ Node* BNB::make_node(int n_facs, int location, Node *p_node)
     n->last_item += 1;
     n->remaining_locations.erase(location);
     n->partial_assignment[n->last_item] = location;
+    n->lower_bound.resize(n_objs);
 
     n->compute_lowerbound(*dist_mat, *flow_mats);
 
     return n;
+
+    // Ideas for the future: compute the lower bound of a child node using only the parent node,
+    // so it will not be necessary create a new node and use more memory and more time
 }
 
 void BNB::initial_solution(list<Solution> &non_dominated_set)

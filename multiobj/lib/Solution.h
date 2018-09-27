@@ -14,16 +14,19 @@ class Solution
 
   public:
     Solution(){}
-    Solution(int n_facs, int n_objs){
+    Solution(int n_facs, int n_objs)
+    {
         permutation.resize(n_facs);
         objs.resize(n_objs);
     }
-    Solution(int perm[], int _objs[], int n_facs, int n_objs){
+    Solution(int perm[], int _objs[], int n_facs, int n_objs)
+    {
         permutation = std::vector<int>(perm, perm + n_facs);
         objs = std::vector<int>(_objs, _objs + n_objs);
     }
 
-    Solution(Solution &s, int i, int j, std::vector<int> &new_objs){
+    Solution(Solution &s, int i, int j, std::vector<int> &new_objs)
+    {
         permutation = s.permutation;
 
         int aux;

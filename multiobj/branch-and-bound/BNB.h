@@ -23,7 +23,8 @@ class BNB
   public:
     BNB();
     
-    BNB(int n_f, int n_o, DistMatrix *dist, FlowMatrices *flows){
+    BNB(int n_f, int n_o, DistMatrix *dist, FlowMatrices *flows)
+    {
         n_facs = n_f;
         n_objs = n_o;
         dist_mat = dist;
