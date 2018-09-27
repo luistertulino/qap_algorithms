@@ -30,6 +30,9 @@ int main(int argc, char const *argv[])
         BNB bnb(n_facs, n_objs, &dist_mat, &flow_mats);
         list<Solution> non_dominated_set;
         pair<int,int> count_nodes = bnb.init(non_dominated_set);
+
+        std::cout << "Number of nodes: " << count_nodes.first << "\n";
+        std::cout << "Number of pruned nodes: " << count_nodes.second << "\n";
     }
     return 0;
 }

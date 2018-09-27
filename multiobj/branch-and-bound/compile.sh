@@ -1,1 +1,1 @@
-g++ -std=c++11 main.cpp bnb.o -o main
+g++ -std=c++11 ../lib/libhungarian/hungarian.o ../lib/*.cpp *.cpp -o main

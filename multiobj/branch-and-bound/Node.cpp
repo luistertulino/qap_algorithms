@@ -5,12 +5,14 @@
 #include <set>
 #include <stdlib.h>
 #include <algorithm>
+#include <iostream>
 
 using std::vector;
 using std::set;
 using std::sort;
 
-int** alloc_table(int size){
+int** alloc_table(int size)
+{
     int** table;
 
     table = (int**)calloc(size,sizeof(int*));
@@ -39,8 +41,8 @@ int scalar(int i, int j, vector< vector<int> > &A, vector< vector<int> > &B){
     return sp;
 }
 
-void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
-
+void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats)
+{
     int re_size = remaining_locations.size();
 
     // We compute the lower bound for each objective
@@ -51,12 +53,11 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
         lower_bound[k] = 0;
         for (int i = 0; i <= last_item; ++i)
         {
-            for (int j = i; j <= last_item; ++j)
+            for (int j = 0; j <= last_item; ++j)
             {
                 int pi = partial_assignment[i];
                 int pj = partial_assignment[j];
-                lower_bound[k] += flow_mats[k][i][j] * dist_mat[pi][pj] + 
-                                  flow_mats[k][j][i] * dist_mat[pj][pi];
+                lower_bound[k] += flow_mats[k][i][j] * dist_mat[pi][pj];
             }
         }
 
@@ -67,13 +68,15 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
         int** L;
         L = alloc_table(re_size);
 
-        DistMatrix D; D.resize(re_size);
+        vector< vector<int> > D; D.resize(re_size);
         vector< vector<int> > F; F.resize(re_size);
 
-        // Here, we only consider only the items not assigned and the locations not used
+        // Here, we consider only the items not assigned and the locations not used
         int a = 0;
         for (int i = last_item+1; i < n_facs; ++i)
         {
+            D[a].resize(re_size); F[a].resize(re_size);
+
             int b = 0;
             for (auto j : remaining_locations)
             {
@@ -87,7 +90,7 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
 
         for (a = 0; a < re_size; a++)
         {
-            // The elements D/F[a][a] are not considered in the min scalar product, só we remove it efficiently
+            // The elements D/F[a][a] are not considered in the min scalar product, sO we remove it efficiently
             int aux = F[a][a]; F[a][a] = F[a][last(F[a])]; F[a][last(F[a])] = aux; F[a].pop_back();
             aux = D[a][a]; D[a][a] = D[a][last(D[a])]; D[a][last(D[a])] = aux; D[a].pop_back();
 
@@ -106,7 +109,6 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
         }
 
         // After computing the L matriz for the k-th objective, we solve the corresponding LAP problem
-
         hungarian_problem_t p;
         int matrix_size = hungarian_init(&p, L, re_size, re_size, HUNGARIAN_MODE_MINIMIZE_COST);
 
@@ -140,4 +142,27 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats){
 
     }
         
+}
+
+void Node::print()
+{
+    std::cout << "-----------------------------------------------------------\n";
+    std::cout << "Last item assigned: " << last_item << "\n";
+    
+    std::cout << "Partial assignment: ";
+    for(int i=0; i <= last_item; i++){
+        std::cout << i << "-" << partial_assignment[i] << ", ";
+    } std::cout << "\n";
+
+    std::cout << "Remaining locations: ";
+    for(auto it : remaining_locations){
+        std::cout << it << ", ";
+    } std::cout << "\n";
+
+    std::cout << "Lower bound: ";
+    for(auto i : lower_bound){
+        std::cout << i << ", ";
+    }
+
+    std::cout << "\n-----------------------------------------------------------\n";
 }

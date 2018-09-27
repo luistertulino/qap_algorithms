@@ -22,7 +22,7 @@ class Node
     set<int> remaining_locations;
 
   public:
-    Node();
+    Node(){}
     Node(int last, set<int> &remaining, vector<int> &partial, int n_f, int n_o){
         last_item = last;
         remaining_locations = remaining;
@@ -47,13 +47,7 @@ class Node
     }
 
     void compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats);
-    
+    void print();
 };
 
 #endif
-
-int main()
-{
-    /* code */
-    return 0;
-}

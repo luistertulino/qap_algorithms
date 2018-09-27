@@ -5,7 +5,6 @@
 
 void Solution::compute_objs(DistMatrix &dist_mat, FlowMatrices &flow_mats){
     int pi, pj;
-
     
     for (int k = 0; k < flow_mats.size(); ++k)
     {

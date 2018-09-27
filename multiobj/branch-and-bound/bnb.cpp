@@ -26,7 +26,7 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
 
     stack<Node*> nodes;
 
-    Node* first_node = initial_node(n_facs);
+    Node* first_node = initial_node();
     nodes.push(first_node);
     num_nodes++;
 
@@ -36,10 +36,9 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
       On the other hand, we can insert a non-prunable node on the stack, but when it's removed,
       there can be a solution that dominates the lower bound of that node.
     */
-    while(!nodes.empty())
+    /*while(!nodes.empty())
     {
         Node *n = nodes.top(); nodes.pop();
-
 
         if(!check_dominance(n->lower_bound, non_dominated_set))
         {
@@ -81,12 +80,20 @@ pair<int,int> BNB::init(list<Solution> &non_dominated_set){
         }
 
         delete n;
-    }
+    }*/
 
     return std::make_pair(num_nodes, pruned_nodes);
 }
 
-void BNB::make_solution(Node *n, list<Solution> &non_dominated_set){
+void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
+{
+    if(n->last_item != n_facs-2)
+    {
+        std::cout << "Calling make_solution with an innapropriate node.\n";
+        if(n->last_item < n_facs-2) std::cout << "Node has not enough assignments yet.\n";
+        else std::cout << "Node has more assignments than should have.\n";
+    }
+
     Solution s;
     s.permutation = n->partial_assignment;
     auto item = n->remaining_locations.begin();
@@ -120,8 +127,8 @@ void BNB::make_solution(Node *n, list<Solution> &non_dominated_set){
     non_dominated_set.push_back(s);
 }
 
-Node* BNB::make_node(int n_facs, int location, Node *p_node){
-
+Node* BNB::make_node(int n_facs, int location, Node *p_node)
+{
     Node *n = new Node(p_node);
 
     n->last_item += 1;
@@ -133,7 +140,8 @@ Node* BNB::make_node(int n_facs, int location, Node *p_node){
     return n;
 }
 
-void BNB::initial_solution(list<Solution> &non_dominated_set){
+void BNB::initial_solution(list<Solution> &non_dominated_set)
+{
     non_dominated_set.emplace_back(n_facs, n_objs);
 
     auto first_s = non_dominated_set.begin();
@@ -144,25 +152,31 @@ void BNB::initial_solution(list<Solution> &non_dominated_set){
     }
 
     first_s->compute_objs(*dist_mat, *flow_mats);
+    first_s->print();
 }
 
-Node* BNB::initial_node(int n_facs){
-
-    Node *n;
-
-    int locations[n_facs];
+Node* BNB::initial_node()
+{
+    Node *n = new Node();
+    //std::cout << "initial node\n";
+    int locations[n_facs]; //std::cout << "array declaration\n";
+    //std::cout << "n_facs: " <<n_facs;
     for (int i = 0; i < n_facs; ++i)
     {
-        locations[i] = i;
+        locations[i] = i; //std::cout << " set loc " << i;
     }
 
-    n->last_item = -1;
-    n->remaining_locations = set<int>(locations, locations+n_facs);
-
+    n->last_item = -1; //std::cout << "Node last_item\n";
+    n->remaining_locations = set<int>(locations, locations+n_facs); //std::cout << "node remaining locations\n";
+    n->partial_assignment.resize(n_facs);
+    
+    n->lower_bound.resize(n_objs);
     for (int i = 0; i < n_objs; ++i)
     {
         n->lower_bound[i] = 0;
-    }
+    } //std::cout << "node lower bound\n";
+
+    //n->print();
 
     return n;
 }

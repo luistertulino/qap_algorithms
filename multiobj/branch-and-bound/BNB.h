@@ -32,7 +32,7 @@ class BNB
     
     pair<int,int> init(list<Solution> &non_dominated_set);
     void initial_solution(list<Solution> &non_dominated_set);
-    Node* initial_node(int n_facs);
+    Node* initial_node();
     Node* make_node(int n_facs, int item, Node *p_node);
     void make_solution(Node *n, list<Solution> &non_dominated_set);
 };
