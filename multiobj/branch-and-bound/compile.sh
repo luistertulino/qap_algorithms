@@ -1,1 +1,1 @@
-g++ -std=c++11 main.cpp lib/* -o main
+g++ -std=c++11 main.cpp bnb.o -o main

@@ -5,7 +5,10 @@
 
 using std::vector;
 
-typedef vector< vector<int> > Dist_Matrix;
-typedef vector< vector< vector<int> > > Flow_Matrices;
+#define last(vec) vec.size()-1
+
+typedef vector< vector<int> > DistMatrix;
+typedef vector< vector< vector<int> > > FlowMatrices;
+
 
 #endif

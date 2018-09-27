@@ -38,9 +38,9 @@ void split_string(std::string &str, std::string &delimiter, std::vector< std::st
     }
 }
 
-void printdata(int &n_facs, int &n_objs, Dist_Matrix &dist_mat, Flow_Matrices &flow_mats);
+void printdata(int &n_facs, int &n_objs, DistMatrix &dist_mat, FlowMatrices &flow_mats);
 
-int read_data(string &file, int &n_facs, int &n_objs, Dist_Matrix &dist_mat, Flow_Matrices &flow_mats)
+int read_data(string &file, int &n_facs, int &n_objs, DistMatrix &dist_mat, FlowMatrices &flow_mats)
 {
     std::vector< std::string > words;
     std::string delimiter = " ";
@@ -74,7 +74,7 @@ int read_data(string &file, int &n_facs, int &n_objs, Dist_Matrix &dist_mat, Flo
                 split_string(line, delimiter, words);
             }
             else{
-                std::cerr << "error in Dist_Matrix in " << file << " file\n";
+                std::cerr << "error in DistMatrix in " << file << " file\n";
                 return -1;
             }
 
@@ -121,10 +121,10 @@ int read_data(string &file, int &n_facs, int &n_objs, Dist_Matrix &dist_mat, Flo
     printdata(n_facs, n_objs, dist_mat, flow_mats);
 }
 
-void printdata(int &n_facs, int &n_objs, Dist_Matrix &dist_mat, Flow_Matrices &flow_mats){
+void printdata(int &n_facs, int &n_objs, DistMatrix &dist_mat, FlowMatrices &flow_mats){
     std::cout << n_facs << " " << n_objs << "\n";
 
-    std::cout << "Dist_Matrix:\n";
+    std::cout << "DistMatrix:\n";
     for (int i = 0; i < n_facs; ++i)
     {
         for (int j = 0; j < n_facs; ++j)
