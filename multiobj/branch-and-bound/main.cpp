@@ -14,6 +14,11 @@ using std::vector;
 using std::list;
 using std::pair;
 
+bool order(Solution &s1, Solution &s2)
+{
+    return (s1.objs < s2.objs);
+}
+
 int main(int argc, char const *argv[])
 {
     if (argc > 1)
@@ -30,9 +35,11 @@ int main(int argc, char const *argv[])
         BNB bnb(n_facs, n_objs, &dist_mat, &flow_mats);
         list<Solution> non_dominated_set;
         pair<int,int> count_nodes = bnb.init(non_dominated_set);
+        non_dominated_set.sort(order);
 
         std::cout << "------------------RESULTS------------------\n";
-        std::cout << "NON-DOMINATED SOLUTIONS\n\n";
+        std::cout << "Number of non_dominated solutions: " << non_dominated_set.size();
+        std::cout << "\nNON-DOMINATED SOLUTIONS\n\n";
         for(auto sol : non_dominated_set)
         {
             sol.print();

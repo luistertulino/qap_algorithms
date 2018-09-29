@@ -29,7 +29,8 @@ int** alloc_table(int size)
     return table;
 }
 
-int scalar(int i, int j, vector< vector<int> > &A, vector< vector<int> > &B){
+int scalar(int i, int j, vector< vector<int> > &A, vector< vector<int> > &B)
+{
     int sp = 0;
 
     for (int k = 0; k < A[i].size(); ++k)
@@ -41,10 +42,21 @@ int scalar(int i, int j, vector< vector<int> > &A, vector< vector<int> > &B){
     return sp;
 }
 
+bool operator<=(Solution &s, Node &n)
+{
+    for (int i = 0; i < n.n_objs; ++i)
+    {
+        if(s.objs[i] > n.lower_bound[i])
+            return false;
+    }
+    return true;
+}
+
 void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats)
 {
     int re_size = remaining_locations.size();
 
+    //print();
     // We compute the lower bound for each objective
     // In the end, the lb will be the ideial point formed by each objective value
     for (int k = 0; k < n_objs; ++k)
@@ -60,6 +72,7 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats)
                 lower_bound[k] += flow_mats[k][i][j] * dist_mat[pi][pj];
             }
         }
+        //std::cout << "l_b["<<k<<"]="<<lower_bound[k]<<"--LAP--";
 
         // Then, we build a matrix L, and use it for computing Gilmore-Lawler bound
 
@@ -129,6 +142,7 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats)
         }
 
         lower_bound[k] += lb;
+        //std::cout << "l_b["<<k<<"]="<<lower_bound[k]<<"\n";
 
         /* ------- FREE THE USED MEMORY ------- */
         hungarian_free(&p);
@@ -141,7 +155,7 @@ void Node::compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats)
         /* ------- FREE THE USED MEMORY ------- */
 
     }
-        
+    //std::cout << "\n-----------------------------------------------------------\n";   
 }
 
 void Node::print()
@@ -159,10 +173,10 @@ void Node::print()
         std::cout << it << ", ";
     } std::cout << "\n";
 
-    std::cout << "Lower bound: ";
+    /*std::cout << "Lower bound: ";
     for(auto i : lower_bound){
         std::cout << i << ", ";
-    }
+    }*/
 
-    std::cout << "\n-----------------------------------------------------------\n";
+    //std::cout << "\n-----------------------------------------------------------\n";
 }

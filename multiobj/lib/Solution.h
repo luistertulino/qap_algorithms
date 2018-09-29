@@ -41,4 +41,8 @@ class Solution
     void print();
 };
 
+bool operator<=(Solution &s1, Solution &s2);
+bool operator==(Solution &s1, Solution &s2);
+bool incomparable(Solution &s1, Solution &s2);
+
 #endif

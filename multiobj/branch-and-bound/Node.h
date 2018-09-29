@@ -6,6 +6,7 @@
 
 #include "../lib/libhungarian/hungarian.h"
 #include "../lib/definitions.h"
+#include "../lib/Solution.h"
 
 using std::vector;
 using std::set;
@@ -52,5 +53,7 @@ class Node
     void compute_lowerbound(DistMatrix &dist_mat, FlowMatrices &flow_mats);
     void print();
 };
+
+bool operator<=(Solution &s, Node &n);
 
 #endif
