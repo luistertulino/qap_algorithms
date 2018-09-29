@@ -118,7 +118,7 @@ int read_data(string &file, int &n_facs, int &n_objs, DistMatrix &dist_mat, Flow
         std::cerr << "error in opening " << file << " file\n";
         return -1;
     }
-    printdata(n_facs, n_objs, dist_mat, flow_mats);
+    //printdata(n_facs, n_objs, dist_mat, flow_mats);
 }
 
 void printdata(int &n_facs, int &n_objs, DistMatrix &dist_mat, FlowMatrices &flow_mats){

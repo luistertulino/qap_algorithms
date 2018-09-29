@@ -101,8 +101,8 @@ int n_k = 2;    // number of objectives
 double corr = 0;   // correlation between 1st and all other objectives
 double amp; // relates to the correlation
 double offset; // relates to the correlation
-int max_flow = 100;
-int max_dist = 100;
+int max_flow = 1000;
+int max_dist = 1000;
 int num_inst = 1;
 
 int d_matrix[MAX_N][MAX_N];
@@ -132,8 +132,8 @@ int main(int argc, char *argv[])
     "n_fac = 30\n"
     "n_k = 2\n"
     "corr = 0\n"
-    "max_flow = 100\n"
-    "max_dist = 100\n"
+    "max_flow = 1000\n"
+    "max_dist = 1000\n"
     "seed = 23453464\n");
 	  exit(1);
 	}
@@ -158,6 +158,7 @@ int main(int argc, char *argv[])
 	    seed = atol(argv[i+1]);
     else if (strcmp("-i", argv[i])==0)
       num_inst = atol(argv[i+1]);
+      seed += num_inst;
 	}
     }
   if(VERBOSE)

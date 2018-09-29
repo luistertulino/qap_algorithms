@@ -179,33 +179,30 @@ void BNB::initial_solution(list<Solution> &non_dominated_set)
     }
 
     first_s->compute_objs(*dist_mat, *flow_mats);
-    first_s->print();
+    //first_s->print();
 }
 
 Node* BNB::initial_node()
 {
     Node *n = new Node();
-    ////std::cout << "initial node\n";
-    int locations[n_facs]; ////std::cout << "array declaration\n";
-    ////std::cout << "n_facs: " <<n_facs;
+
+    int locations[n_facs];
     for (int i = 0; i < n_facs; ++i)
     {
-        locations[i] = i; ////std::cout << " set loc " << i;
+        locations[i] = i;
     }
 
     n->n_facs = n_facs;
     n->n_objs = n_objs;
-    n->last_item = -1; ////std::cout << "Node last_item\n";
-    n->remaining_locations = set<int>(locations, locations+n_facs); ////std::cout << "node remaining locations\n";
+    n->last_item = -1;
+    n->remaining_locations = set<int>(locations, locations+n_facs);
     n->partial_assignment.resize(n_facs);
     
     n->lower_bound.resize(n_objs);
     for (int i = 0; i < n_objs; ++i)
     {
         n->lower_bound[i] = 0;
-    } ////std::cout << "node lower bound\n";
-
-    //n->print();
+    }
 
     return n;
 }
