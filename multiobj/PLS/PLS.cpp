@@ -6,9 +6,11 @@
 #include <list>
 #include <vector>
 #include <random>
+#include <algorithm>
 
 using std::list;
 using std::vector;
+using std::swap;
 
 std::random_device rand_dev;
 std::mt19937 gen(rand_dev());
@@ -60,7 +62,9 @@ int PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
     {
         // Select a random solution from non_visited to be examined
         std::uniform_int_distribution<int> rand(0, last(non_visited));
-        int sol_index = rand(gen);
+        int r = rand(gen);
+        int sol_index = non_visited[r];
+        swap(non_visited[r], non_visited.back()); non_visited.pop_back(); // Remove that solution index from non_visited
 
         // Explore the neighborhood
         /*
