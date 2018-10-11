@@ -1,8 +1,0 @@
-medidas:
-nome_da_instância tempo nós_abertos número_podas 
-
-em solutions/
-instancia.out
-	- numsoluções numobjs
-	- permutação
-	- objetivos

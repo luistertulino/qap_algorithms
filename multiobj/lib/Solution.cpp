@@ -63,22 +63,3 @@ bool incomparable(Solution &s1, Solution &s2)
 {
     return !(s1 <= s2) and !(s2 <= s1);
 }
-
-/* USELESS FOR NOW (class vector has its own <= operator)
-bool operator<=(std::vector<int> &objs1, std::vector<int> &objs2)
-{
-    std::cout << "\nobjs1.size() = " << objs1.size() << "\n";
-    for (int i = 0; i < objs1.size(); ++i)
-    {
-        std::cout << "\nfor of <=\n";
-        if(objs1[i] > objs2[i])
-            return false;
-    }
-    return true;
-}
-
-bool incomparable(std::vector<int> &objs1, std::vector<int> &objs2)
-{
-    return !(objs1 <= objs2) and !(objs2 <= objs1);
-}
-*/

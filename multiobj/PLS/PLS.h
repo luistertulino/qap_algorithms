@@ -3,7 +3,7 @@
 
 #define DISCARDED 0
 
-#include "definitions.h"
+#include "../lib/definitions.h"
 #include "SolutionPLS.h"
 
 #include <list>
@@ -18,16 +18,30 @@ class PLS
     int n_facs, n_objs;
     DistMatrix *distances;
     FlowMatrices *flows;
+    vector<Matrix> deltas; // Delta matrix for each objective (based on RoTS by Eric Taillard)
   public:
-  	PLS(int n_f, int n_o)
+  	PLS(int n_f, int n_o, DistMatrix *dist, FlowMatrices *_flows)
     {
         n_facs = n_f;
         n_objs = n_o;
+        distances = dist;
+        flows = _flows;
+
+        deltas.resize(n_objs);
+        for (int k = 0; k < n_objs; ++k)
+        {
+            deltas[k].resize(n_facs);
+            for (int i = 0; i < n_facs; ++i)
+            {
+                deltas[k][i].resize(n_facs);
+            }
+        }
     }
-  	~PLS();
+
+    void random_solution(SolutionPLS &s);
 
     int init(bool num_avals_crit, int max_num_avals, float time_limit,
-            list<SolutionPLS> &non_dominated);
+            vector<SolutionPLS*> &non_dominated);
         // Main procedure
         /*
           Parameters:
@@ -38,15 +52,11 @@ class PLS
                 the stopping criterium is only the emptiness of the non-visited solutions set
         */
 
-    void compute_objs(Solution &s, int i, int j, vector<int> &new_objs;);
-        // Function to quickly compute the objs of a new solution created by 2-opt neighborhood
+    void compute_deltas(SolutionPLS &sol, int i, int j, vector<int> &deltas);
+        // Compute the variation for each objective
 
-    int create_neighborhood(Solution &s);
-        // Given a solution, generate its neighbors, based on 2-opt neighborhood
-
-    bool try_update_nondom_set(vector<int> &new_objs, list<SolutionPLS> &non_dominated);
-        // Checks if a solution domintes, is dominated or non-dominated
- 
+    bool update_nondom_set(SolutionPLS *solution, vector<SolutionPLS*> &non_dominated);
+        // Update the non-dominated set
 };
 
 #endif
