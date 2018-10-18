@@ -12,9 +12,13 @@
 using std::string;
 using std::vector;
 
+#define ERROR_READING_DATA -1
+#define READING_OK 0
+
 typedef vector< vector<int> > Matrix;
 
-void split_string(std::string &str, std::string &delimiter, std::vector< std::string > &words){
+void split_string(std::string &str, std::string &delimiter, std::vector< std::string > &words)
+{
     // Splits a string based on a delimiter
 
     int i = 0;
@@ -41,7 +45,8 @@ void split_string(std::string &str, std::string &delimiter, std::vector< std::st
     }
 }
 
-void split_string(std::string &str, std::vector< std::string > &words){
+void split_string(std::string &str, std::vector< std::string > &words)
+{
     std::istringstream buf(str);
     std::istream_iterator<std::string> beg(buf), end;
 
@@ -70,7 +75,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
         }
         else{
             std::cerr << "error in reading n of" << file << " file\n";
-            return -1;
+            return ERROR_READING_DATA;
         }
         if (std::getline(problem_file, line, '\n')){
             if (line == "") std::cout << "linha em branco\n";
@@ -89,7 +94,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             }
             else{
                 std::cerr << "error in Dist_Matrix in " << file << " file\n";
-                return -1;
+                return ERROR_READING_DATA;
             }
 
             for (int j = 0; j < n_facs; ++j)
@@ -117,7 +122,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             }
             else{
                 std::cerr << "error in Flow_Matrix in " << file << " file\n";
-                return -1;
+                return ERROR_READING_DATA;
             }
 
             for (int j = 0; j < n_facs; ++j)
@@ -133,10 +138,10 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
     }
     else{
         std::cerr << "error in opening " << file << " file\n";
-        return -1;
+        return ERROR_READING_DATA;
     }
     //printdata(n_facs, dist_mat, flow_mat);
-
+    return READING_OK;
 }
 
 int read_solution(string &file){
@@ -158,7 +163,7 @@ int read_solution(string &file){
 
         solution_file.close();
     }
-    else return -1;
+    else return ERROR_READING_DATA;
 
 }
 
@@ -177,7 +182,8 @@ void write_results(string &results_file, string &instance, int obj, int sol){
 }
 
 // Function just for testing
-void printdata(int &n_facs, Matrix &dist_mat, Matrix &flow_mat){
+void printdata(int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
+{
     std::cout << n_facs << "\n";
 
     std::cout << "Dist_Matrix:\n";
