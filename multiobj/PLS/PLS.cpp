@@ -37,7 +37,6 @@ int PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
 {
     SolutionPLS *s = new SolutionPLS(n_facs, n_objs);
     random_solution(*s);
-    //s->print();
 
     vector<int> non_visited;
     non_visited.push_back(0);
@@ -82,7 +81,6 @@ int PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
         {
             for (int j = i+1; j < n_facs and not found; ++j)
             {
-                //compute_deltas(*curr, i, j, deltas);
                 SolutionPLS *new_sol = new SolutionPLS(*curr, i, j, deltas);
                 new_sol->compute_objs(*distances, *flows); //new_sol->print();
                 num_avals++;
@@ -211,8 +209,7 @@ bool PLS::update_nondom_set(SolutionPLS *solution, vector<SolutionPLS*> &non_dom
             i--;
         }
     }
-
-
+    
     non_dominated.push_back(solution);
     return true;
 }

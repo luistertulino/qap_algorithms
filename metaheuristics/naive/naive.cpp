@@ -6,11 +6,9 @@
 #include <cmath> // For std::round
 
 #include "../lib/readdata.h"
-//#include "../lib/hungarian-algorithm/Hungarian.h"
 #include "../lib/libhungarian/hungarian.h"
 
 #define last(vec) vec.size()-1
-
 
 using std::string;
 using std::vector;
@@ -78,29 +76,16 @@ int heuristic(int n_facs, Matrix &dist_mat, Matrix &flow_mat){
 		}
 	}
 
-	/*std::cout << "lapmatrix:\n";
-	print_matrix(lapmatrix);
-	std::cout << "assignment: \n";
-	for (int i = 0; i < n_facs; ++i)
-	{
-		std::cout << "facility " << i << " to location " << assignment[i] << "\n";
-	}
-	std::cout << "lowerbound = " << lowerbound << "\n";
-    std::cout << "quad cost: " << obj;*/
-
 	return obj;
 }
 
 int computeLAP(int n_facs, Matrix &lapmatrix, vector<int> &assignment){
-	//HungarianAlgorithm HungAlgo;
 	hungarian_problem_t p;
 
 	int** m = vector_to_matrix(lapmatrix);
 
-	int matrix_size = hungarian_init(&p, m, n_facs, n_facs, HUNGARIAN_MODE_MINIMIZE_COST) ;
-	//hungarian_print_costmatrix(&p);
+	int matrix_size = hungarian_init(&p, m, n_facs, n_facs, HUNGARIAN_MODE_MINIMIZE_COST);
 	hungarian_solve(&p);
-	//hungarian_print_assignment(&p);
 
     int lb = 0;
     for (int i = 0; i < n_facs; ++i)
@@ -126,18 +111,6 @@ int computeLAP(int n_facs, Matrix &lapmatrix, vector<int> &assignment){
 	  free(m);
     /* ------- FREE THE USED MEMORY ------- */
 
-
-	/*{
-		vector< vector<double> > double_matrix(n_facs, vector<double>(n_facs));
-		for (int i = 0; i < n_facs; ++i)
-		{
-			for (int j = 0; j < n_facs; ++j)
-			{
-				double_matrix[i][j] = lapmatrix[i][j];
-			}
-		}
-        double lb = HungAlgo.Solve(double_matrix, assignment);
-	}*/
 	return std::round(lb);
 }
 
@@ -163,25 +136,15 @@ void computeLAPmatrix(int n_facs, Matrix &dist_mat, Matrix &flow_mat, Matrix &la
 		sort(A[i].begin(), A[i].end());
 	}
 
-	////std::cout << "depois de remover diagonais e ordenar\n\n"; //std::cout << "A:\n"; print_matrix(A); //std::cout << "B:\n"; print_matrix(B);
-
-
 	for (int i = 0; i < n_facs; ++i)
 	{
 		for (int j = 0; j < n_facs; ++j)
 		{
 			int lij = flow_mat[i][i]*dist_mat[j][j];
-			////std::cout << "l_"<<i<<j<<": "<<lij<<" ";
 			lij += scalar(i, j, A, B);
-			////std::cout << "l_"<<i<<j<<": "<<lij<<"\n";
 			lapmatrix[i][j] = lij;
 		}
-		////std::cout << "\n";
 	}
-
-	// print Lij matrix
-	////std::cout << "print Lij matrix\n\n";
-	
 }
 
 int scalar(int i, int j, Matrix &A, Matrix &B){
@@ -189,10 +152,8 @@ int scalar(int i, int j, Matrix &A, Matrix &B){
 
 	for (int k = 0; k < A[i].size(); ++k)
 	{
-		//std::cout << A[i][k] << "*" << B[j][last(B[j])-k] << " + ";
 		sp += A[i][k] * B[j][last(B[j])-k];
 	}
-	////std::cout << "// ";
 	return sp;
 }
 
