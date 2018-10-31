@@ -2,12 +2,20 @@
 
 #include <vector>
 
+#include <random> // for random devices
+#include <chrono> // for measuring time
+
 using std::vector;
+
+float time_limit = 1000;
+bool time_limit_crit = true;
+int max_iter = 1000000; // 1 million
+bool max_iter_crit = false;
 
 /*--------------------------------------------------------------*/
 /*       compute the cost difference if elements i and j        */
 /*         are transposed in permutation (solution) p           */
-/*            based on RoTS code by Eric Taillard               */
+/*            Based on RoTS code by Eric Taillard               */
 /*--------------------------------------------------------------*/
 long HybridTS::compute_delta(int i, int j, solution &s)
 {
@@ -35,7 +43,7 @@ long HybridTS::compute_delta(int i, int j, solution &s)
 /*--------------------------------------------------------------*/
 /*      Idem, but the value of delta[i][j] is supposed to       */
 /*    be known before the transposition of elements r and s     */
-/*            based on RoTS code by Eric Taillard               */
+/*            Based on RoTS code by Eric Taillard               */
 /*--------------------------------------------------------------*/
 long HybridTS::compute_delta(int i, int j, int r, int s, solution &s)
 {
@@ -51,4 +59,47 @@ long HybridTS::compute_delta(int i, int j, int r, int s, solution &s)
          distances[ s.p[j] ][ s.p[r] ] - distances[ s.p[i] ][ s.p[r] ] );
     
     return d;
+}
+
+bool HybridTS::isTabu(int i, int j, solution &s, int curr_tabu, int it)
+{
+    if( tabu_list[i][s.p[j]] + curr_tabu >= it ) return true;
+    else return false;
+}
+
+void HybridTS::make_tabu(int i, int j, solution &s, int it)
+{
+    tabu_list[i][s.p[i]] = it;
+    tabu_list[j][s.p[j]] = it;
+}
+
+int init()
+{
+    time_t begin, now;
+    time(&begin);
+    
+    /* -------------- Generate a random initial solution -------------- */
+    solution best(n_facs); best.shuffle();
+    for(int i = 0; i < n_facs; i++)
+    {
+        for(int j = 0; j < n_facs; j++)
+        {
+            best.cost += flows[i][j] * distances[ s.p[i] ][ s.p[j] ];
+
+            // Initialize delta matrix (based on code by Eric Taillard)
+            if(i < j) { delta[i][j] = compute_delta(i, j, best); }
+        }
+    }
+    /* -------------- Generate a random initial solution -------------- */
+
+    int num_iter = 1;
+    /* 
+       Checks if maximum number of iterations is adopted.
+       If it is, checks whether that number was reached.
+       If it's not, checks whether the time limit for main loop'was reached.
+    */
+    while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
+    {
+        
+    }
 }
