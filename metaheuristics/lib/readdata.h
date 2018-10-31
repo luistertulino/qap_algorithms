@@ -78,7 +78,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             return ERROR_READING_DATA;
         }
         if (std::getline(problem_file, line, '\n')){
-            if (line == "") std::cout << "linha em branco\n";
+            if (line == ""){} //std::cout << "linha em branco\n";
         } 
 
         /* -------------- Read distance matrix -------------- */
@@ -106,7 +106,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
         }
 
         if (std::getline(problem_file, line, '\n')){
-            if (line == "") std::cout << "linha em branco\n";
+            if (line == ""){} //std::cout << "linha em branco\n";
         }
 
         /* -------------- Read flow matrix -------------- */        
