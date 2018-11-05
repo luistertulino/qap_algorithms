@@ -15,6 +15,7 @@ struct prob_params
 	int n_facs;
 	int min_tabu_list;
 	int delta;
+	int max_fails;
 };
 
 #endif

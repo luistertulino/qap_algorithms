@@ -91,13 +91,16 @@ int main(int argc, char const *argv[])
 
 bool read_parameters(char const *argv[], prob_params &params)
 {
-	std::stringstream strv2, strv3;
+	std::stringstream strv2, strv3, strv4;
 
 	strv2 << argv[2];
-	int min_tabu; strv2 >> min_tabu; //std::cout << "min_tabu: " << min_tabu << "\n";
+	strv2 >> params.min_tabu; //std::cout << "min_tabu: " << min_tabu << "\n";
 
 	strv3 << argv[3];
-	int delta; strv3 >> delta; //std::cout << "delta: " << delta << "\n";
+	strv3 >> params.delta; //std::cout << "delta: " << delta << "\n";
+
+	strv4 << argv[4];
+	strv3 >> params.max_fails;
 
 	return true;
 }

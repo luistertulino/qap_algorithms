@@ -1,9 +1,9 @@
 #include "HybridTS.h"
 
 #include <vector>
-
 #include <random> // for random devices
 #include <chrono> // for measuring time
+#include <climits>
 
 using std::vector;
 
@@ -90,7 +90,9 @@ int HybridTS::init()
             if(i < j) { delta[i][j] = compute_delta(i, j, best); }
         }
     }
+    solution s; s = best;
     /* -------------- Generate a random initial solution -------------- */
+
 
     int num_iter = 1;
     /* 
@@ -98,9 +100,33 @@ int HybridTS::init()
        If it is, checks whether that number was reached.
        If it's not, checks whether the time limit for main loop was reached.
     */
+
+    int items[n_facs]; // Available items for swapping
     while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
     {
-        
+        for (int i = 0; i < n_facs; ++i) items[i] = i;
+        int item_begin = 0;
+
+    	int fails = 0;
+    	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
+    	while(fails < max_fails
+    		  and
+    		  time_limit_crit ? difftime(time(&now),begin) < time_limit : true )
+    	{
+    		int i_retained = j_retained = -1;
+    		bool improv = false;
+    		long f_s1 = LONG_MA
+
+    		for (int i = item_begin; i < n_facs and not improv; ++i)
+    		{
+    			for (int j = i+1; j < count and not improv; ++j)
+    			{
+    				
+    			}
+    		}
+    	}
+    	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
+
     }
 
 }

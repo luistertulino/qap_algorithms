@@ -47,6 +47,7 @@ class HybridTS
     int n_facs;
     int min_tabu_list;
     int delta_tabu;
+    int max_fails;
     Matrix distances, flows;
     Matrix tabu_list;
     MatrixLong delta;
@@ -57,6 +58,7 @@ class HybridTS
         n_facs = params.n_facs;
         min_tabu_list = params.min_tabu_list;
         delta_tabu = params.delta;
+        max_fails = params.max_fails;
         distances = dist;
         flows = flow;
 
