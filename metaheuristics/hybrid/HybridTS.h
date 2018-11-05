@@ -1,9 +1,10 @@
 #ifndef HYBRIDTS_H_
 #define HYBRIDTS_H_
 
-#include "../lib/definitions"
+#include "../lib/definitions.h"
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 using std::vector;
 
@@ -26,12 +27,23 @@ struct solution
 
     void shuffle()
     {
-        std::random_shuffle(s.p.begin(), s.p.end());
+        std::random_shuffle(p.begin(), p.end());
+    }
+
+    void print()
+    {
+        std::cout << "Permutation: ";
+        for (int i = 0; i < n_facs; ++i)
+        {
+            std::cout << i << "->" << p[i] << " ";
+        }
+        std::cout << "\n";
     }
 };
 
 class HybridTS
 {
+  public:
     int n_facs;
     int min_tabu_list;
     int delta_tabu;
@@ -39,6 +51,7 @@ class HybridTS
     Matrix tabu_list;
     MatrixLong delta;
 
+  public:
     HybridTS(prob_params &params, Matrix &dist, Matrix &flow)
     {
         n_facs = params.n_facs;
@@ -60,7 +73,7 @@ class HybridTS
         {
             for(int j = 0; j < n_facs; j++)
             {
-                tabu_list[i][j] = - min_tabu_list;
+                tabu_list[i][j] = -min_tabu_list;
             }
         }
     }
@@ -68,8 +81,8 @@ class HybridTS
     int init();
     bool isTabu(int i, int j, solution &s, int curr_tabu, int it);
     void make_tabu(int i, int j, solution &s, int it);
-    long compute_delta(int i, int j, solution &s);
-    long compute_delta(int i, int j, int r, int s, solution &s);
+    long compute_delta(int i, int j, solution &sol);
+    long compute_delta(int i, int j, int r, int s, solution &sol);
     
 };
 
