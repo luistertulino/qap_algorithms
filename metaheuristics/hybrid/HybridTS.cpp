@@ -7,10 +7,12 @@
 
 using std::vector;
 
+std::random_device rd;
+std::mt19937 gen(rd());
+
 float time_limit = 1000;
-bool time_limit_crit = true;
 int max_iter = 1000000; // 1 million
-bool max_iter_crit = false;
+bool max_iter_crit = true;
 
 /*--------------------------------------------------------------*/
 /*       compute the cost difference if elements i and j        */
@@ -77,6 +79,12 @@ int HybridTS::init()
 {
     time_t begin, now;
     time(&begin);
+
+    /* -------------- Simulated annealing variables -------------- */
+    double t_begin = 2; // Initial temperature
+    double t_end = 1; // Final temperature
+    double beta = (t_begin - t_end) / (max_iter * t_begin * t_end );
+    /* -------------- Simulated annealing variables -------------- */
     
     /* -------------- Generate a random initial solution -------------- */
     solution best(n_facs); best.shuffle();
@@ -102,28 +110,70 @@ int HybridTS::init()
     */
 
     int items[n_facs]; // Available items for swapping
+    double temperature = t_begin;
+
+    std::uniform_int_distribution<int> distribution(min_tabu_list, min_tabu_list+delta_tabu);
+    int curr_tabu = distribution(gen); // Current size of tabu "list"
+    
     while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
     {
         for (int i = 0; i < n_facs; ++i) items[i] = i;
         int item_begin = 0;
 
-    	int fails = 0;
+    	int num_fails = 0;
+
+        MatrixLong delta_temp = delta;
+
+        if(num_iter % 2*(min_tabu_list+delta_tabu) == 0) curr_tabu = distribution(gen);
+            // Taillard's random update of tabu list size at each 2*s_max iterations
+
+        
     	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
-    	while(fails < max_fails
-    		  and
-    		  time_limit_crit ? difftime(time(&now),begin) < time_limit : true )
+    	while(num_fails < max_fails)
     	{
     		int i_retained = j_retained = -1;
     		bool improv = false;
-    		long f_s1 = LONG_MA
+    		long f_s1 = LONG_MAX;
 
     		for (int i = item_begin; i < n_facs and not improv; ++i)
     		{
-    			for (int j = i+1; j < count and not improv; ++j)
+                int ri = items[i];
+    			for (int j = i+1; j < n_facs and not improv; ++j)
     			{
-    				
+                    int rj = items[j];
+
+    				if(s.cost + delta[ri][rj] < best.cost // Aspiration criterium
+                       or
+                       s.cost + delta[ri][rj] < s.cost and not isTabu(ri, rj, s, curr_tabu, num_iter)
+                       // Movement does not improve best solution but improves current and is not tabu
+                    {
+                        i_retained = i; j_retained = j;
+                        improv = true;
+
+                    }
+                    else if(not isTabu(ri, rj, s, curr_tabu, num_iter)
+                            and
+                            s.cost + delta[ri][rj] < f_s1)
+                    {
+                        i_retained = i; j_retained = j;
+                    }
+
     			}
     		}
+
+            f_s1 = s.cost + delta[i_retained][j_retained]; // Modification on current solution
+
+            if(improv) num_fails = 0;
+            else num_fails++;
+
+            /* -----------------------------------
+                TODO: guardar última modificação que melhorou a melhor solução
+                Como: guardar lista de swaps realizados
+
+                TODO: atualizar tabela local de deltas
+
+                TODO: "remover" i_ret e j_ret da lista de permitidos
+            ----------------------------------- */
     	}
     	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
 
