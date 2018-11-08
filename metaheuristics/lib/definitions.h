@@ -16,6 +16,8 @@ struct prob_params
 	int min_tabu_list;
 	int delta;
 	int max_fails;
+	int threshold;
+	int aspiration;
 };
 
 #endif

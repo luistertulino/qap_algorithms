@@ -18,8 +18,11 @@ bool read_parameters(char const *argv[], prob_params &params);
 /*
 	PARAMETERS OF THE ALGORITHM:
 	1 - Instance name
-	2 - Minimum tabu list size: 10, 20, 30
-	3 - Variation of tabu list size: 0, 5, 10, 15, 20
+	2 - Minimum tabu list size (values: 0.5n, 0.75n, 0.9n, n, 1.1n, 1.25n, 1.5n)
+	3 - Variation of tabu list size (values: 0, 5, 10, 15, 20)
+	4 - Maximum number of failures (values: 0.5n, 0.6n, 0.7n, 0.8n, 0.9n, n)
+	5 - Threshold for using second aspiration function (values: 30, 40, 50, 60, 70)
+	6 - Extra iterations for second aspiration function(values: 0.5n, n, 1.5n, 2n, 2.5n, 3n)
 */
 int main(int argc, char const *argv[])
 {
@@ -91,7 +94,7 @@ int main(int argc, char const *argv[])
 
 bool read_parameters(char const *argv[], prob_params &params)
 {
-	std::stringstream strv2, strv3, strv4;
+	std::stringstream strv2, strv3, strv4, strv5, strv6;
 
 	strv2 << argv[2];
 	strv2 >> params.min_tabu; //std::cout << "min_tabu: " << min_tabu << "\n";
@@ -100,7 +103,13 @@ bool read_parameters(char const *argv[], prob_params &params)
 	strv3 >> params.delta; //std::cout << "delta: " << delta << "\n";
 
 	strv4 << argv[4];
-	strv3 >> params.max_fails;
+	strv4 >> params.max_fails;
+
+	strv5 << argv[5];
+	strv5 >> params.threshold;
+
+	strv6 << argv[6];
+	strv6 >> params.aspiration;
 
 	return true;
 }

@@ -44,10 +44,12 @@ struct solution
 class HybridTS
 {
   public:
-    int n_facs;
-    int min_tabu_list;
-    int delta_tabu;
-    int max_fails;
+    int n_facs;        // Problem size
+    int min_tabu_list; // Minimun tabu list size
+    int delta_tabu;    // Maximum variation of tabu list size
+    int max_fails;     // Maximum number of fails in improving best solution: when an improvement is not made, the simulated annealing is used
+    int threshold;     // The minimum problem size to use second aspiration function
+    int aspiration;    // The extra iterations of second aspiration function
     Matrix distances, flows;
     Matrix tabu_list;
     MatrixLong delta;
@@ -59,6 +61,8 @@ class HybridTS
         min_tabu_list = params.min_tabu_list;
         delta_tabu = params.delta;
         max_fails = params.max_fails;
+        threshold = params.threshold;
+        aspiration = params.aspiration;
         distances = dist;
         flows = flow;
 
@@ -68,15 +72,6 @@ class HybridTS
         {
             tabu_list[i].resize(n_facs);
             delta[i].resize(n_facs);
-        }
-
-        // Initialize tabu list
-        for(int i = 0; i < n_facs; i++)
-        {
-            for(int j = 0; j < n_facs; j++)
-            {
-                tabu_list[i][j] = -min_tabu_list;
-            }
         }
     }
 

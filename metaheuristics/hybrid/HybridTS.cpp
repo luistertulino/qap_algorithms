@@ -98,9 +98,33 @@ int HybridTS::init()
             if(i < j) { delta[i][j] = compute_delta(i, j, best); }
         }
     }
-    solution s; s = best;
+    solution curr; curr = best;
     /* -------------- Generate a random initial solution -------------- */
 
+    std::uniform_int_distribution<int> distribution(min_tabu_list, min_tabu_list+delta_tabu);
+    int curr_tabu = distribution(gen); // Current size of tabu list
+
+    /* -------------- Initialize tabu list -------------- */
+    for(int i = 0; i < n_facs; i++)
+    {
+        for(int j = 0; j < n_facs; j++)
+        {
+            tabu_list[i][j] = 0;
+            // Indicates until which iteration the allocation of j in i will be tabu
+        }
+    }
+    /* -------------- Initialize tabu list -------------- */
+
+    double temperature = t_begin;
+
+    bool use_second = (n_facs >= threshold); // Whether to use or not the second aspiration function. If that's the case, this functions takes priority over the classical one
+    
+    int num_fails = 0;
+    /*  
+        When a degrading movement is accepted by simulated annealing, this counter is incremented
+        When a movement improves the best solution, it is restarted
+        When it reaches a threshold, the current solution is restarted, together with the tabu list
+    */
 
     int num_iter = 1;
     /* 
@@ -108,75 +132,38 @@ int HybridTS::init()
        If it is, checks whether that number was reached.
        If it's not, checks whether the time limit for main loop was reached.
     */
-
-    int items[n_facs]; // Available items for swapping
-    double temperature = t_begin;
-
-    std::uniform_int_distribution<int> distribution(min_tabu_list, min_tabu_list+delta_tabu);
-    int curr_tabu = distribution(gen); // Current size of tabu "list"
-    
     while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
     {
-        for (int i = 0; i < n_facs; ++i) items[i] = i;
-        int item_begin = 0;
-
-    	int num_fails = 0;
-
-        MatrixLong delta_temp = delta;
-
         if(num_iter % 2*(min_tabu_list+delta_tabu) == 0) curr_tabu = distribution(gen);
             // Taillard's random update of tabu list size at each 2*s_max iterations
-
         
-    	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
-    	while(num_fails < max_fails)
-    	{
-    		int i_retained = j_retained = -1;
-    		bool improv = false;
-    		long f_s1 = LONG_MAX;
+        int i_retained = -1, j_retained = -1;
+        long min_delta = LONG_MAX;
+        bool aspired = false;
+        bool already_aspired = false;
 
-    		for (int i = item_begin; i < n_facs and not improv; ++i)
-    		{
-                int ri = items[i];
-    			for (int j = i+1; j < n_facs and not improv; ++j)
-    			{
-                    int rj = items[j];
+        // Explore neighborhood
+        for(int i = 0; i < n_facs; i++)
+        {
+            for(int j = i+1; j < n_facs; j++)
+            {
+                bool tabu = isTabu(i, j, s, curr_tabu, num_iter);
+                aspired = (use_second and // Second aspiration function by Taillard. It is only used for "big" problems
+                           (tabu_list[i][ s.p[j] ] < num_iter - aspiration) and
+                           (tabu_list[j][ s.p[i] ] < num_iter - aspiration) 
+                          or
+                          curr.cost + delta[i][j] < best.cost);
 
-    				if(s.cost + delta[ri][rj] < best.cost // Aspiration criterium
-                       or
-                       s.cost + delta[ri][rj] < s.cost and not isTabu(ri, rj, s, curr_tabu, num_iter)
-                       // Movement does not improve best solution but improves current and is not tabu
-                    {
-                        i_retained = i; j_retained = j;
-                        improv = true;
-
-                    }
-                    else if(not isTabu(ri, rj, s, curr_tabu, num_iter)
-                            and
-                            s.cost + delta[ri][rj] < f_s1)
-                    {
-                        i_retained = i; j_retained = j;
-                    }
-
-    			}
-    		}
-
-            f_s1 = s.cost + delta[i_retained][j_retained]; // Modification on current solution
-
-            if(improv) num_fails = 0;
-            else num_fails++;
-
-            /* -----------------------------------
-                TODO: guardar última modificação que melhorou a melhor solução
-                Como: guardar lista de swaps realizados
-
-                TODO: atualizar tabela local de deltas
-
-                TODO: "remover" i_ret e j_ret da lista de permitidos
-            ----------------------------------- */
-    	}
-    	/* ------------------------ "EJECTION CHAIN" LOOP ------------------------ */
-
+                bool lesser_delta = (delta[i][j] < min_delta);
+                if(
+                    (aspired and not already_aspired) // First move aspired
+                    or
+                    (aspired and already_aspired and lesser_delta) // More than one move was aspired and take the best one
+                    or
+                    (not aspired and not already_aspired and lesser_delta and not tabu) // 
+                )
+            }
+        }
     }
 
 }
