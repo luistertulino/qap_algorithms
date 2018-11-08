@@ -4,6 +4,7 @@
 #include <random> // for random devices
 #include <chrono> // for measuring time
 #include <climits>
+#include <algorithm> // std::swap
 
 using std::vector;
 
@@ -63,16 +64,16 @@ long HybridTS::compute_delta(int i, int j, int r, int s, solution &sol)
     return d;
 }
 
-bool HybridTS::isTabu(int i, int j, solution &sol, int curr_tabu, int it)
+bool HybridTS::isTabu(int i, int j, solution &sol, int it)
 {
-    if( tabu_list[i][sol.p[j]] + curr_tabu >= it ) return true;
-    else return false;
+    if( tabu_list[i][sol.p[j]] < it ) return false;
+    else return true;
 }
 
-void HybridTS::make_tabu(int i, int j, solution &sol, int it)
+void HybridTS::make_tabu(int i, int j, solution &sol, int curr_tabu, int it)
 {
-    tabu_list[i][sol.p[i]] = it;
-    tabu_list[j][sol.p[j]] = it;
+    tabu_list[i][sol.p[i]] = it + curr_tabu;
+    tabu_list[j][sol.p[j]] = it + curr_tabu;
 }
 
 int HybridTS::init()
@@ -147,7 +148,7 @@ int HybridTS::init()
         {
             for(int j = i+1; j < n_facs; j++)
             {
-                bool tabu = isTabu(i, j, s, curr_tabu, num_iter);
+                bool tabu = isTabu(i, j, s, num_iter);
                 aspired = (use_second and // Second aspiration function by Taillard. It is only used for "big" problems
                            (tabu_list[i][ s.p[j] ] < num_iter - aspiration) and
                            (tabu_list[j][ s.p[i] ] < num_iter - aspiration) 
@@ -155,14 +156,41 @@ int HybridTS::init()
                           curr.cost + delta[i][j] < best.cost);
 
                 bool lesser_delta = (delta[i][j] < min_delta);
-                if(
-                    (aspired and not already_aspired) // First move aspired
+                if( (aspired and not already_aspired) // First move aspired
                     or
                     (aspired and already_aspired and lesser_delta) // More than one move was aspired and take the best one
                     or
-                    (not aspired and not already_aspired and lesser_delta and not tabu) // 
-                )
+                    (not aspired and not already_aspired and lesser_delta and not tabu) )
+                {
+                    i_retained = i; j_retained = j;
+                    min_delta = delta[i][j];
+
+                    if(aspired) already_aspired = true;
+                }
             }
+        }
+
+        if(i_retained == -1) // No move was retained
+        {
+            // DECIDE PRECISELY WHAT TO DO HERE
+        }
+        else
+        {
+            if(curr.cost < best.cost) best = curr;
+            else{
+                // IMPLEMENT SIMULATED ANNEALING
+            }
+            // Apply move
+            swap(curr.p[i_retained], curr.p[j_retained]);
+            // Update solution value
+            curr.cost += delta[i_retained][j_retained];
+            // Update tabu list with the move made
+            make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
+            // Possibly update best solution
+            
+
+            // Update delta matrix
+            update_delta_matrix(i_retained, j_retained, curr); // to implement
         }
     }
 

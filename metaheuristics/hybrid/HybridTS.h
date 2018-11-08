@@ -76,11 +76,11 @@ class HybridTS
     }
 
     int init();
-    bool isTabu(int i, int j, solution &s, int curr_tabu, int it);
-    void make_tabu(int i, int j, solution &s, int it);
+    bool isTabu(int i, int j, solution &s, int it);
+    void make_tabu(int i, int j, solution &s, int curr_tabu, int it);
     long compute_delta(int i, int j, solution &sol);
     long compute_delta(int i, int j, int r, int s, solution &sol);
-    
+    void update_delta_matrix(int i, int j, solution &s);
 };
 
 #endif
