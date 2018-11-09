@@ -5,6 +5,7 @@
 #include <chrono> // for measuring time
 #include <climits>
 #include <algorithm> // std::swap
+#include <cmath> // exp 
 
 using std::vector;
 
@@ -102,16 +103,26 @@ int HybridTS::init()
     solution curr; curr = best;
     /* -------------- Generate a random initial solution -------------- */
 
+    /* -------------- Matrix of allocation couting -------------- */
+    Matrix alloc_count; alloc_count.resize(n_facs);
+    for(int i = 0; i < n_facs; i++)
+        alloc_count[i].resize(n_facs, 0);
+
+    for(int i = 0; i < n_facs; i++)
+        alloc_count[i][curr.p[i]] += 1;
+    /* -------------- Matrix of allocation couting -------------- */
+
     std::uniform_int_distribution<int> distribution(min_tabu_list, min_tabu_list+delta_tabu);
     int curr_tabu = distribution(gen); // Current size of tabu list
+
+    std::uniform_real_distribution<double> annealing(0.0,1.0); // For annealing random selection
 
     /* -------------- Initialize tabu list -------------- */
     for(int i = 0; i < n_facs; i++)
     {
         for(int j = 0; j < n_facs; j++)
         {
-            tabu_list[i][j] = 0;
-            // Indicates until which iteration the allocation of j in i will be tabu
+            tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
         }
     }
     /* -------------- Initialize tabu list -------------- */
@@ -170,27 +181,53 @@ int HybridTS::init()
             }
         }
 
+        bool new_sol = false; // When it's true, a complete new solution was generated
+
         if(i_retained == -1) // No move was retained
         {
             // DECIDE PRECISELY WHAT TO DO HERE
+            // random restart? path relinking?
+
+            new_sol = true;
         }
         else
         {
-            if(curr.cost < best.cost) best = curr;
-            else{
-                // IMPLEMENT SIMULATED ANNEALING
+            long new_cost = curr.cost + delta[i_retained][j_retained];
+            if(new_cost < best.cost // Improves best solution
+               or
+               (num_fails < max_fails and annealing(gen) < exp( (best.cost-new_cost)/temperature ))
+                  // Does not improve best solution but is selected to be applied by the simulated annealing criterium
+            {
+                // Apply move
+                swap(curr.p[i_retained], curr.p[j_retained]);
+                // Update solution value
+                curr.cost += delta[i_retained][j_retained];
+                // Update tabu list with the move made
+                make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
+                // Update delta matrix
+                update_delta_matrix(i_retained, j_retained, curr); // to implement
             }
-            // Apply move
-            swap(curr.p[i_retained], curr.p[j_retained]);
-            // Update solution value
-            curr.cost += delta[i_retained][j_retained];
-            // Update tabu list with the move made
-            make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
-            // Possibly update best solution
-            
+            else{ // The move was not selected. Do a random restart on the solution
+                // random_restart(curr, alloc_count); ------------------>>>>> TO IMPLEMENT YET
 
-            // Update delta matrix
-            update_delta_matrix(i_retained, j_retained, curr); // to implement
+                new_sol = true;
+            }            
+        }
+
+        for(int i = 0; i < n_facs; i++)
+            alloc_count[i][curr.p[i]] += 1;
+
+        if(new_cost < best.cost) best = curr;
+
+        if(new_sol) // When a new solution is generated, the delta table must be restarted
+        {
+            for(int i = 0; i < n_facs; i++)
+            {
+                for(int j = i+1; j < n_facs; j++)
+                {
+                    delta[i][j] = compute_delta(i, j, curr);
+                }
+            }
         }
     }
 
