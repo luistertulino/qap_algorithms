@@ -16,6 +16,8 @@ float time_limit = 1000;
 int max_iter = 1000000; // 1 million
 bool max_iter_crit = true;
 
+void random_restart(solution &s, Matrix &alloc_count);
+
 /*--------------------------------------------------------------*/
 /*       compute the cost difference if elements i and j        */
 /*         are transposed in permutation (solution) p           */
@@ -163,8 +165,8 @@ int HybridTS::init()
                 aspired = (use_second and // Second aspiration function by Taillard. It is only used for "big" problems
                            (tabu_list[i][ s.p[j] ] < num_iter - aspiration) and
                            (tabu_list[j][ s.p[i] ] < num_iter - aspiration) 
-                          or
-                          curr.cost + delta[i][j] < best.cost);
+                           or
+                           curr.cost + delta[i][j] < best.cost);
 
                 bool lesser_delta = (delta[i][j] < min_delta);
                 if( (aspired and not already_aspired) // First move aspired
@@ -185,17 +187,15 @@ int HybridTS::init()
 
         if(i_retained == -1) // No move was retained
         {
-            // DECIDE PRECISELY WHAT TO DO HERE
-            // random restart? path relinking?
-
-            new_sol = true;
+            random_restart(curr, alloc_count);new_sol = true;
+            curr.comp_cost();
         }
         else
         {
             long new_cost = curr.cost + delta[i_retained][j_retained];
             if(new_cost < best.cost // Improves best solution
                or
-               (num_fails < max_fails and annealing(gen) < exp( (best.cost-new_cost)/temperature ))
+               (num_fails < max_fails and annealing(gen) < exp((best.cost-new_cost)/temperature) ) )
                   // Does not improve best solution but is selected to be applied by the simulated annealing criterium
             {
                 // Apply move
@@ -204,13 +204,10 @@ int HybridTS::init()
                 curr.cost += delta[i_retained][j_retained];
                 // Update tabu list with the move made
                 make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
-                // Update delta matrix
-                update_delta_matrix(i_retained, j_retained, curr); // to implement
             }
             else{ // The move was not selected. Do a random restart on the solution
-                // random_restart(curr, alloc_count); ------------------>>>>> TO IMPLEMENT YET
-
-                new_sol = true;
+                random_restart(curr, alloc_count);new_sol = true;
+                curr.comp_cost();
             }            
         }
 
@@ -219,16 +216,49 @@ int HybridTS::init()
 
         if(new_cost < best.cost) best = curr;
 
-        if(new_sol) // When a new solution is generated, the delta table must be restarted
+        // Update delta table
+        for(int i = 0; i < n_facs; i++)
         {
-            for(int i = 0; i < n_facs; i++)
+            for(int j = i+1; j < n_facs; j++)
             {
-                for(int j = i+1; j < n_facs; j++)
-                {
-                    delta[i][j] = compute_delta(i, j, curr);
+                if(i_retained != -1 and j_retained != -1
+                   and
+                   i != i_retained and i != j_retained
+                   and
+                   j != i_retained and j != j_retained)
+                { 
+                    delta[i][j] = compute_delta(i, j, i_retained, j_retained, curr);
                 }
+                else delta[i][j] = compute_delta(i, j, curr);
             }
         }
+        
     }
 
+}
+
+void random_restart(solution &s, Matrix &alloc_count)
+{
+    int items[s.n_facs]; int remaining = s.n_facs;
+    for(int i = 0; i < s.n_facs; i++) items[i] = i;
+    vector<int> reverse_count(remaining,0);
+
+    for(int i = 0; i < s.n_facs; i++) // For each item, chooses its location
+    {
+        /* 
+            The probability that a location j is selected to item i is reverse to the number of times
+            that the allocation i->j was made.
+        */
+        int sum = 0;
+        for(int j = 0; j < remaining; j++) sum += alloc_count[i][items[j]];        
+        for(int j = 0; j < remaining; j++) reverse_count[j] = sum - alloc_count[i][items[j]];
+
+        std::discrete_distribution<int> dist(reverse_count.begin(), reverse_count.end());
+        int selected = dist(gen)
+        s.p[i] = items[selected];
+
+        // remove that location of possible ones
+        std::swap(items[selected], items[remaining-1]);
+        remaining--;
+    }
 }

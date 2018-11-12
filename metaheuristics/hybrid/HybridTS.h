@@ -30,6 +30,18 @@ struct solution
         std::random_shuffle(p.begin(), p.end());
     }
 
+    void comp_cost()
+    {
+        cost = 0;
+        for(int i = 0; i < n_facs; i++)
+        {
+            for(int j = 0; j < n_facs; j++)
+            {
+                cost += flows[i][j] * distances[ best.p[i] ][ best.p[j] ];
+            }
+        }
+    }
+
     void print()
     {
         std::cout << "Permutation: ";
