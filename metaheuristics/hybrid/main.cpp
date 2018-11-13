@@ -90,7 +90,12 @@ int main(int argc, char const *argv[])
 	HybridTS ts(params, dist_mat, flow_mat);
 	solution sol = ts.init();
 
+	std::cout << "=========== END ==============\n";
 	sol.print();
+	sol.comp_cost(flow_mat, dist_mat);
+	std::cout << "---------------------\n";
+	sol.print();
+	std::cout << "=========== END ==============\n";
 
 	return 0;
 }
@@ -100,19 +105,19 @@ bool read_parameters(char const *argv[], prob_params &params)
 	std::stringstream strv2, strv3, strv4, strv5, strv6;
 
 	strv2 << argv[2];
-	strv2 >> params.min_tabu_list; //std::cout << "min_tabu: " << min_tabu << "\n";
+	strv2 >> params.min_tabu_list; std::cout << "min_tabu: " << params.min_tabu_list << "\n";
 
 	strv3 << argv[3];
-	strv3 >> params.delta; //std::cout << "delta: " << delta << "\n";
+	strv3 >> params.delta; std::cout << "delta: " << params.delta << "\n";
 
 	strv4 << argv[4];
-	strv4 >> params.max_fails;
+	strv4 >> params.max_fails; std::cout << "max_fails: " << params.max_fails << "\n";
 
 	strv5 << argv[5];
-	strv5 >> params.threshold;
+	strv5 >> params.threshold; std::cout << "threshold: " << params.threshold << "\n";
 
 	strv6 << argv[6];
-	strv6 >> params.aspiration;
+	strv6 >> params.aspiration; std::cout << "aspiration: " << params.aspiration << "\n";
 
 	return true;
 }

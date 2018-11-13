@@ -66,7 +66,7 @@ class solution
 
     void random_restart(Matrix &alloc_count, std::mt19937 &gen)
     {
-        std::cout << "random_restart ";
+        std::cout << "==============================random_restart ";
         int items[n_facs]; int remaining = n_facs;
         for(int i = 0; i < n_facs; i++) items[i] = i;
         vector<int> reverse_count(remaining,0);
@@ -91,7 +91,7 @@ class solution
             remaining--;
             reverse_count.pop_back();
         }
-        std::cout << "end of random_restart\n";
+        std::cout << "end of random_restart=======================================\n";
         print();
     }
 };
