@@ -1,57 +1,12 @@
 #ifndef HYBRIDTS_H_
 #define HYBRIDTS_H_
 
-#include "../lib/definitions.h"
+#include "solution.h"
 #include <vector>
 #include <algorithm>
 #include <iostream>
 
 using std::vector;
-
-struct solution
-{
-    int n_facs;
-    vector<int> p; // Permutation of QAP. p[i] = j indicates that item i is allocated on place j
-    long cost; // Cost of that solution
-
-    solution(int n)
-    {
-        p.resize(n);
-        n_facs = n;
-        for(int i = 0; i < n; i++)
-        {
-            p[i] = i;
-        }
-        cost = 0;
-    }
-
-    void shuffle()
-    {
-        std::random_shuffle(p.begin(), p.end());
-    }
-
-    void comp_cost()
-    {
-        cost = 0;
-        for(int i = 0; i < n_facs; i++)
-        {
-            for(int j = 0; j < n_facs; j++)
-            {
-                cost += flows[i][j] * distances[ best.p[i] ][ best.p[j] ];
-            }
-        }
-    }
-
-    void print()
-    {
-        std::cout << "Permutation: ";
-        for (int i = 0; i < n_facs; ++i)
-        {
-            std::cout << i << "->" << p[i] << " ";
-        }
-        std::cout << "\n";
-    }
-};
 
 class HybridTS
 {
@@ -62,6 +17,7 @@ class HybridTS
     int max_fails;     // Maximum number of fails in improving best solution: when an improvement is not made, the simulated annealing is used
     int threshold;     // The minimum problem size to use second aspiration function
     int aspiration;    // The extra iterations of second aspiration function
+    long qaplib_sol;    // Solution value available in solution file from QAPLIB
     Matrix distances, flows;
     Matrix tabu_list;
     MatrixLong delta;
@@ -75,6 +31,7 @@ class HybridTS
         max_fails = params.max_fails;
         threshold = params.threshold;
         aspiration = params.aspiration;
+        qaplib_sol = params.qaplib_sol;
         distances = dist;
         flows = flow;
 
@@ -87,7 +44,7 @@ class HybridTS
         }
     }
 
-    int init();
+    solution init();
     bool isTabu(int i, int j, solution &s, int it);
     void make_tabu(int i, int j, solution &s, int curr_tabu, int it);
     long compute_delta(int i, int j, solution &sol);

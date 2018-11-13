@@ -1,1 +1,1 @@
-g++ -std=c++11 ../lib/*.h HybridTS.h *.cpp -o exec
+g++ -std=c++11 *.cpp -o exec

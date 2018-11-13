@@ -74,11 +74,13 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             n_facs = std::stoi(words[0], nullptr);
             std::cout << n_facs;
         }
-        else{
+        else
+        {
             std::cerr << "error in reading n of" << file << " file\n";
             return ERROR_READING_DATA;
         }
-        if (std::getline(problem_file, line, '\n')){
+        if (std::getline(problem_file, line, '\n'))
+        {
             if (line == ""){} //std::cout << "linha em branco\n";
         } 
 
@@ -88,12 +90,14 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
         {
             dist_mat[i].resize(n_facs);
 
-            if (std::getline(problem_file, line, '\n')){
+            if (std::getline(problem_file, line, '\n'))
+            {
                 words.clear();
                 //split_string(line, delimiter, words);
                 split_string(line, words);
             }
-            else{
+            else
+            {
                 std::cerr << "error in Dist_Matrix in " << file << " file\n";
                 return ERROR_READING_DATA;
             }
@@ -116,12 +120,14 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
         {
             flow_mat[i].resize(n_facs);
 
-            if (std::getline(problem_file, line, '\n')){
+            if(std::getline(problem_file, line, '\n'))
+            {
                 words.clear();
                 //split_string(line, delimiter, words);
                 split_string(line, words);
             }
-            else{
+            else
+            {
                 std::cerr << "error in Flow_Matrix in " << file << " file\n";
                 return ERROR_READING_DATA;
             }
@@ -129,15 +135,13 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             for (int j = 0; j < n_facs; ++j)
             {            
                 int f_ij = std::stoi(words[j], nullptr);
-                flow_mat[i][j] = f_ij;               
-                
+                flow_mat[i][j] = f_ij;
             }
         }
-
-        problem_file.close();
-        
+        problem_file.close();        
     }
-    else{
+    else
+    {
         std::cerr << "error in opening " << file << " file\n";
         return ERROR_READING_DATA;
     }
@@ -145,8 +149,8 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
     return READING_OK;
 }
 
-int read_solution(string &file){
-    
+long read_solution(string &file)
+{    
     std::ifstream solution_file(file, std::ios::in);
 
     if (solution_file.is_open())
@@ -158,7 +162,7 @@ int read_solution(string &file){
             //split_string(line, delimiter, words);
             split_string(line, words);
 
-            int sol = std::stoi(words[1], nullptr);
+            long sol = std::stoi(words[1], nullptr);
             return sol;
         }
 
@@ -168,7 +172,8 @@ int read_solution(string &file){
 
 }
 
-void write_results(string &results_file, string &instance, int obj, int sol){
+void write_results(string &results_file, string &instance, int obj, int sol)
+{
     std::ofstream outfile;
     outfile.open(results_file, std::ios::app);
 

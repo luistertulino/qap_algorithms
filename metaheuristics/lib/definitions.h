@@ -13,6 +13,7 @@ typedef vector< vector<long> > MatrixLong;
 struct prob_params
 {
 	int n_facs;
+	long qaplib_sol;
 	int min_tabu_list;
 	int delta;
 	int max_fails;

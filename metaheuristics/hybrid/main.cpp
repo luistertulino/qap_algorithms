@@ -18,11 +18,11 @@ bool read_parameters(char const *argv[], prob_params &params);
 /*
 	PARAMETERS OF THE ALGORITHM:
 	1 - Instance name
-	2 - Minimum tabu list size (values: 0.5n, 0.75n, 0.9n, n, 1.1n, 1.25n, 1.5n)
+	2 - Minimum tabu list size (values: 5, 10, 15, 20, 30)
 	3 - Variation of tabu list size (values: 0, 5, 10, 15, 20)
-	4 - Maximum number of failures (values: 0.5n, 0.6n, 0.7n, 0.8n, 0.9n, n)
+	4 - Maximum number of failures (values: 5, 6, 7, 8, 9, 10)
 	5 - Threshold for using second aspiration function (values: 30, 40, 50, 60, 70)
-	6 - Extra iterations for second aspiration function(values: 0.5n, n, 1.5n, 2n, 2.5n, 3n)
+	6 - Extra iterations for second aspiration function(values: 10, 15, 20, 30, 40)
 */
 int main(int argc, char const *argv[])
 {
@@ -59,12 +59,13 @@ int main(int argc, char const *argv[])
 
 		std::cout << params.n_facs << "\n";
 
-		int sol = read_solution(sfile);
+		long sol = read_solution(sfile);
 		if (sol == ERROR_READING_DATA)
 		{
 			std::cout << "Error in reading solution of " << file << ".\n";
 			return -1;
 		}
+		params.qaplib_sol = sol;
 
 		if(not read_parameters(argv, params))
 		{
@@ -87,7 +88,9 @@ int main(int argc, char const *argv[])
 	}
 
 	HybridTS ts(params, dist_mat, flow_mat);
-	ts.init();
+	solution sol = ts.init();
+
+	sol.print();
 
 	return 0;
 }
@@ -97,7 +100,7 @@ bool read_parameters(char const *argv[], prob_params &params)
 	std::stringstream strv2, strv3, strv4, strv5, strv6;
 
 	strv2 << argv[2];
-	strv2 >> params.min_tabu; //std::cout << "min_tabu: " << min_tabu << "\n";
+	strv2 >> params.min_tabu_list; //std::cout << "min_tabu: " << min_tabu << "\n";
 
 	strv3 << argv[3];
 	strv3 >> params.delta; //std::cout << "delta: " << delta << "\n";
