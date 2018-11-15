@@ -20,10 +20,7 @@ class solution
     {
         p.resize(n);
         n_facs = n;
-        for(int i = 0; i < n; i++)
-        {
-            p[i] = i;
-        }
+        for(int i = 0; i < n; i++) p[i] = i;
         cost = 0;
     }
 
@@ -36,10 +33,7 @@ class solution
         return *this;
     }
 
-    void shuffle(std::mt19937 &g)
-    {
-        std::shuffle(p.begin(), p.end(), g);
-    }
+    void shuffle(std::mt19937 &g){ std::shuffle(p.begin(), p.end(), g); }
 
     void comp_cost(Matrix &flows, Matrix &distances)
     {
@@ -47,9 +41,7 @@ class solution
         for(int i = 0; i < n_facs; i++)
         {
             for(int j = 0; j < n_facs; j++)
-            {
                 cost += flows[i][j] * distances[ p[i] ][ p[j] ];
-            }
         }
     }
 
@@ -66,7 +58,6 @@ class solution
 
     void random_restart(Matrix &alloc_count, std::mt19937 &gen)
     {
-        std::cout << "==============================random_restart ";
         int items[n_facs]; int remaining = n_facs;
         for(int i = 0; i < n_facs; i++) items[i] = i;
         vector<int> reverse_count(remaining,0);
@@ -91,7 +82,5 @@ class solution
             remaining--;
             reverse_count.pop_back();
         }
-        std::cout << "end of random_restart=======================================\n";
-        print();
     }
 };

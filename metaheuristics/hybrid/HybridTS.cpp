@@ -145,16 +145,16 @@ solution HybridTS::init()
     while(num_iter < max_iter/100)
     {
         num_iter++;        
-        if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0)
-        {
-            curr_tabu = distribution(gen);
-            std::cout << "------curr tabu: " << curr_tabu << "---------\n";
-        }
+        if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0) curr_tabu = distribution(gen);
 
         int it1 = rand_item(gen);
         int it2 = rand_item(gen); while(it2 == it1) it2 = rand_item(gen);
 
-        if(delta[it1][it2] > 0){ dmin = std::min(dmin, delta[it1][it2]); dmax = std::max(dmax, delta[it1][it2]); }
+        if(delta[it1][it2] > 0)
+        { 
+            dmin = std::min(dmin, delta[it1][it2]); 
+            dmax = std::max(dmax, delta[it1][it2]); 
+        }
 
         bool tabu = isTabu(it1, it2, curr, num_iter);
         bool aspired = (use_second and // Second aspiration function by Taillard. It is only used for "big" problems
@@ -170,6 +170,7 @@ solution HybridTS::init()
             make_tabu(it1, it2, curr, curr_tabu, num_iter);
         }
         else continue; // if the move was not valid, there is nothing else to do
+
         if(curr.cost < best.cost) best = curr;
 
         // Update delta table, but only if a movement as applied
@@ -182,7 +183,6 @@ solution HybridTS::init()
                 else delta[i][j] = compute_delta(i, j, curr);
             }
         }
-
     }
 
     double t_begin = dmin + (dmax - dmin)/10.0; // Initial temperature
@@ -201,11 +201,10 @@ solution HybridTS::init()
     	if(best.cost <= qaplib_sol) iteration_found = num_iter;
 
         if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0)
-        {
+        { // Taillard's random update of tabu list size at each 2*s_max iterations
             curr_tabu = distribution(gen);
-            std::cout << "------curr tabu: " << curr_tabu << "---------\n";
-        }
-            // Taillard's random update of tabu list size at each 2*s_max iterations
+            //std::cout << "------curr tabu: " << curr_tabu << "---------\n";
+        }            
         
         int i_retained = -1, j_retained = -1;
         long min_delta = LONG_MAX;

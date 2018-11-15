@@ -41,7 +41,7 @@ int main(int argc, char const *argv[])
 
 		if (file.find("chr") != std::string::npos or file.find("scr") != std::string::npos)
 		{
-			int read = read_data(pfile, n_facs, flow_mat, dist_mat);
+			int read = read_data(pfile, params.n_facs, flow_mat, dist_mat);
 			if (read != READING_OK)
 			{
 				std::cout << "Error in reading instance " << file << ".\n";
