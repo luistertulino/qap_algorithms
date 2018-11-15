@@ -24,7 +24,8 @@ bool order(SolutionPLS *s1, SolutionPLS *s2)
 void writedata(int n_objs, 
                int n_facs,
                string &instance, 
-               vector<SolutionPLS*> &non_dominated_set)
+               vector<SolutionPLS*> &non_dominated_set,
+               time_eval p)
 {
     /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
     string outf = "../PLSresults/";
@@ -40,7 +41,7 @@ void writedata(int n_objs,
         return;
     }
 
-    outfile << non_dominated_set.size() << " " << n_facs << " " << n_objs << "\n";
+    outfile << non_dominated_set.size() << " " << p.first << " " << p.second << " " << n_facs << " " << n_objs << "\n";
 
     for (int i = 0; i < non_dominated_set.size(); i++)
     {
@@ -102,14 +103,14 @@ int main(int argc, char const *argv[])
         PLS pls(n_facs, n_objs, &dist_mat, &flow_mats);
         vector<SolutionPLS*> non_dominated_set;
 
-        bool num_avals_crit = false;
-        int num_avals = 0;
-        float time_limit = 100;
-        pls.init(num_avals_crit, num_avals, time_limit, non_dominated_set);
+        bool num_avals_crit = true;
+        int num_avals = 500000;
+        float time_limit = 500;
+        time_eval p = pls.init(num_avals_crit, num_avals, time_limit, non_dominated_set);
 
         std::sort(non_dominated_set.begin(), non_dominated_set.end(), order);
 
-        writedata(n_objs, n_facs, instance, non_dominated_set);
+        writedata(n_objs, n_facs, instance, non_dominated_set, p);
         // difftime(now,begin)
         
         /*

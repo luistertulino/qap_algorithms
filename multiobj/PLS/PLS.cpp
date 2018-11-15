@@ -8,6 +8,7 @@
 #include <random>
 #include <algorithm>
 #include <iostream>
+#include <utility> // for std::pair
 
 #include <chrono>
 #include <thread>
@@ -15,6 +16,7 @@
 using std::list;
 using std::vector;
 using std::swap;
+using std::pair;
 
 std::random_device rand_dev;
 std::mt19937 gen(rand_dev());
@@ -32,7 +34,7 @@ void PLS::random_solution(SolutionPLS &s)
 bool check_dominance(SolutionPLS *solution, vector<SolutionPLS*> &non_dominated_set);
 
 
-int PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
+time_eval PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
               vector<SolutionPLS*> &non_dominated)
 {
     SolutionPLS *s = new SolutionPLS(n_facs, n_objs);
@@ -133,6 +135,9 @@ int PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
         }
 
     }
+
+    time_eval p(difftime(time(&now),begin), num_avals);
+    return p;
 }
 
 bool check_dominance(SolutionPLS *solution, vector<SolutionPLS*> &non_dominated_set)

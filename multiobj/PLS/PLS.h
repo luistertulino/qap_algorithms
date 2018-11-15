@@ -8,9 +8,13 @@
 
 #include <list>
 #include <vector>
+#include <utility> // for std::pair
 
 using std::list;
 using std::vector;
+using std::pair;
+
+typedef pair<double,int> time_eval;
 
 class PLS
 {
@@ -40,7 +44,7 @@ class PLS
 
     void random_solution(SolutionPLS &s);
 
-    int init(bool num_avals_crit, int max_num_avals, float time_limit,
+    time_eval init(bool num_avals_crit, int max_num_avals, float time_limit,
             vector<SolutionPLS*> &non_dominated);
         // Main procedure
         /*
