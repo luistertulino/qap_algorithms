@@ -44,11 +44,9 @@ void Solution::print()
 
 bool operator<=(Solution &s1, Solution &s2)
 {
+    if(s1.objs == s2.objs) return false;
     for (int i = 0; i < s1.objs.size(); ++i)
-    {
-        if(s1.objs[i] > s2.objs[i])
-            return false;
-    }
+        if(s1.objs[i] > s2.objs[i]) return false;
     return true;
 }
 
