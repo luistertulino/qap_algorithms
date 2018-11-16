@@ -22,10 +22,12 @@ class AnyNichedPTS
     int n_facs, n_objs;
     DistMatrix *distances;
     FlowMatrices *flows;
-    int size_arc_init
-    double refset_size; // In percentage
     int size_arc_init;
-  public:
+    double refset_size; // In percentage
+    int min_tabu_list; // Minimun tabu list size
+    int delta_tabu;    // Maximum variation of tabu list size
+    Matrix tabu_list;
+
   	AnyNichedPTS(int n_f, int n_o, DistMatrix *dist, FlowMatrices *_flows, 
       int refset_size, int size_arc_init) /* >>>>>> Change it later to receive a struct with all parameters <<<<<< */
     {
@@ -34,25 +36,22 @@ class AnyNichedPTS
         distances = dist;
         flows = _flows;
 
-        deltas.resize(n_objs);
-        for (int k = 0; k < n_objs; ++k)
-        {
-            deltas[k].resize(n_facs);
-            for (int i = 0; i < n_facs; ++i)
-            {
-                deltas[k][i].resize(n_facs);
-            }
-        }
+        tabu_list.resize(n_facs, vector<int>(n_facs, 0));
     }
 
     void random_solution(SolutionTS &s);
 
-    void random_archive(vector<SolutionTS*> &archive, int size_arc, vector<int> &non_visited);
+    void random_archive(vector<SolutionTS*> &archive, int size_arc, vector<int> &non_visited,
+                        vector<long> &min_objs, vector<long> &max_objs);
 
     int select_solution(vector<SolutionTS*> &archive, vector<int> &non_visited,
                         vector<long> &min_objs, vector<long> &max_objs);
 
     double dij(SolutionTS &s1, SolutionTS &s2, vector<long> &min_objs, vector<long> &max_objs);
+
+    bool isTabu(int i, int j, SolutionTS &s, int it);
+
+    void make_tabu(int i, int j, SolutionTS &s, int curr_tabu, int it);
 
     time_eval init(bool num_avals_crit, int max_num_avals, float time_limit,
             vector<SolutionTS*> &non_dominated);

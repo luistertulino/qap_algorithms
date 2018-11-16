@@ -40,7 +40,21 @@ class SolutionTS : public Solution
         status = -1;
         niche_count = 1;
     }
-    SolutionTS(SolutionTS &sol, int l_i, int l_j, int _status)
+    SolutionTS(SolutionTS &sol, int l_i, int l_j)
+    {
+        // Creates a new solution based in a solution, the movement made and the variation on objs
+        n_facs = sol.n_facs;
+        n_objs = sol.n_objs;
+        last_i = l_i;
+        last_j = l_j;
+        permutation = sol.permutation;
+        swap(permutation[l_i], permutation[l_j]);
+        objs.resize(n_objs);
+        visited = false;
+        status = -1;
+        niche_count = sol.niche_count;
+    }
+    /*SolutionTS(SolutionTS &sol, int l_i, int l_j, int _status)
     {
         // Creates a new solution based in a solution, the movement made and the variation on objs
         n_facs = sol.n_facs;
@@ -57,7 +71,7 @@ class SolutionTS : public Solution
         visited = false;
         status = _status;
         niche_count = sol.niche_count;
-    }
+    }*/
 
     SolutionTS & operator=(SolutionTS &s)
     {
@@ -71,8 +85,7 @@ class SolutionTS : public Solution
         status = s.status;
         sol.niche_count;
         return *this;
-    }
-    
+    }    
 };
 
 #endif
