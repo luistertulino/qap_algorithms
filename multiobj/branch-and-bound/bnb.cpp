@@ -125,8 +125,7 @@ void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
     {
         if (s.objs == it_sol->objs)
         {
-            if(s.permutation == it_sol->permutation) return;
-            
+            if(s.permutation == it_sol->permutation) return;            
             else continue;
         }
         else if(s <= *it_sol)
@@ -153,16 +152,12 @@ void BNB::make_solution(Node *n, list<Solution> &non_dominated_set)
 Node* BNB::make_node(int n_facs, int location, Node *p_node)
 {
     Node *n = new Node(p_node);
-
     n->last_item += 1;
     n->remaining_locations.erase(location);
     n->partial_assignment[n->last_item] = location;
     n->lower_bound.resize(n_objs);
-
     n->compute_lowerbound(*dist_mat, *flow_mats);
-
     return n;
-
     // Ideas for the future: compute the lower bound of a child node using only the parent node,
     // so it will not be necessary create a new node and use more memory and more time
 }
@@ -170,14 +165,8 @@ Node* BNB::make_node(int n_facs, int location, Node *p_node)
 void BNB::initial_solution(list<Solution> &non_dominated_set)
 {
     non_dominated_set.emplace_back(n_facs, n_objs);
-
     auto first_s = non_dominated_set.begin();
-
-    for (int i = 0; i < n_facs; ++i)
-    {
-        first_s->permutation[i] = i;
-    }
-
+    for (int i = 0; i < n_facs; ++i) first_s->permutation[i] = i;
     first_s->compute_objs(*dist_mat, *flow_mats);
     //first_s->print();
 }
@@ -187,11 +176,7 @@ Node* BNB::initial_node()
     Node *n = new Node();
 
     int locations[n_facs];
-    for (int i = 0; i < n_facs; ++i)
-    {
-        locations[i] = i;
-    }
-
+    for (int i = 0; i < n_facs; ++i) locations[i] = i;
     n->n_facs = n_facs;
     n->n_objs = n_objs;
     n->last_item = -1;
@@ -199,10 +184,7 @@ Node* BNB::initial_node()
     n->partial_assignment.resize(n_facs);
     
     n->lower_bound.resize(n_objs);
-    for (int i = 0; i < n_objs; ++i)
-    {
-        n->lower_bound[i] = 0;
-    }
-
+    for (int i = 0; i < n_objs; ++i) n->lower_bound[i] = 0;
+    
     return n;
 }
