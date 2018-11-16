@@ -68,8 +68,9 @@ long HybridTS::compute_delta(int i, int j, int r, int s, solution &sol)
 
 bool HybridTS::isTabu(int i, int j, solution &sol, int it)
 {
-    if( tabu_list[i][sol.p[j]] < it ) return false;
-    else return true;
+    if( tabu_list[i][sol.p[j]] >= it and
+        tabu_list[j][sol.p[i]] >= it ) return true;
+    else return false;
 }
 
 void HybridTS::make_tabu(int i, int j, solution &sol, int curr_tabu, int it)
@@ -114,12 +115,7 @@ solution HybridTS::init()
 
     /* -------------- Initialize tabu list -------------- */
     for(int i = 0; i < n_facs; i++)
-    {
-        for(int j = 0; j < n_facs; j++)
-        {
-            tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
-        }
-    }
+        for(int j = 0; j < n_facs; j++) tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
     /* -------------- Initialize tabu list -------------- */
 
     bool use_second = (n_facs >= threshold); // Whether to use or not the second aspiration function. If that's the case, this functions takes priority over the classical one
