@@ -150,7 +150,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
 }
 
 long read_solution(string &file)
-{    
+{
     std::ifstream solution_file(file, std::ios::in);
 
     if (solution_file.is_open())
