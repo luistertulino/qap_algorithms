@@ -5,6 +5,7 @@
 #define CASE_ANYWAY 2
 
 #include "../lib/Solution.h"
+#include "../lib/definitions.h"
 
 #include <algorithm>
 #include <vector>
@@ -16,8 +17,11 @@ class SolutionTS : public Solution
 {
   public:
     int n_facs, n_objs;
+    vector<int> p; // Permutation
+    vector<long> objs; // Objective functions
     bool visited; // true if this solution was explored; false otherwise
     int last_i, last_j; // Indicates the last movement made in the solution
+    vector<int> deltas; // stores the variation of objs at the previous step of the iteration
     int status; // if 1, that solution is at least non-dominated;
                 // if 2, that solution enters in the archive anyway
     double niche_count;
@@ -85,7 +89,9 @@ class SolutionTS : public Solution
         status = s.status;
         sol.niche_count;
         return *this;
-    }    
+    }
+
+    void compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatrix &distances);    
 };
 
 #endif
