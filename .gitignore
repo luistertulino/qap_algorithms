@@ -5,5 +5,5 @@ metaheuristics/solutions
 metaheuristics/lib/hungarian-algorithm
 *exec
 *.o
-
 *results.txt
+*.out
