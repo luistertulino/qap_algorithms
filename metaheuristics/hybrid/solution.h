@@ -33,6 +33,14 @@ class solution
         return *this;
     }
 
+    void resize(int n)
+    {
+        p.resize(n);
+        n_facs = n;
+        for(int i = 0; i < n; i++) p[i] = i;
+        cost = 0;
+    }
+
     void shuffle(std::mt19937 &g){ std::shuffle(p.begin(), p.end(), g); }
 
     void comp_cost(Matrix &flows, Matrix &distances)

@@ -30,9 +30,11 @@ int main(int argc, char const *argv[])
     Matrix dist_mat;
     Matrix flow_mat;
 
+    string file;
+
     if (argc > 1)
     {
-        string file(argv[1]);
+        file = string(argv[1]);
         string pfile = "../instances/"+file+".dat";
         string sfile = "../solutions/"+file+".sln";
         string rfile = "results/"+file+".out";
@@ -90,16 +92,8 @@ int main(int argc, char const *argv[])
     //std::cout << "going to construct ts\n";
     HybridTS ts(params, dist_mat, flow_mat);
     //std::cout << "init method\n";
-    solution sol = ts.init();
-
-    //std::cout << "=========== END ==============\n";
-    sol.print();
-    sol.comp_cost(flow_mat, dist_mat);
-   // std::cout << "---------------------\n";
-    sol.print();
-    //std::cout << "=========== END ==============\n";
-
-    return 0;
+    ts.init();
+    ts.write_results(file);
 }
 
 bool read_parameters(char const *argv[], prob_params &params)

@@ -5,11 +5,16 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <string>
 
 using std::vector;
+using std::string;
 
 class HybridTS
 {
+    solution best;
+    int iteration_found; // Iteration when the solution from qaplib (or better) was found
+
   public:
     int n_facs;        // Problem size
     int min_tabu_list; // Minimun tabu list size
@@ -42,14 +47,19 @@ class HybridTS
             tabu_list[i].resize(n_facs);
             delta[i].resize(n_facs);
         }
+
+        iteration_found = -1;
+        best.resize(n_facs);
     }
 
-    solution init();
+    void init();
     bool isTabu(int i, int j, solution &s, int it);
     void make_tabu(int i, int j, solution &s, int curr_tabu, int it);
     long compute_delta(int i, int j, solution &sol);
     long compute_delta(int i, int j, int r, int s, solution &sol);
     void update_delta_matrix(int i, int j, solution &s);
+
+    void write_results(string &instance);
 };
 
 #endif

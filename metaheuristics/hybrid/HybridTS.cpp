@@ -6,8 +6,14 @@
 #include <climits>
 #include <algorithm> // std::swap
 #include <cmath> // exp 
+#include <string>
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using std::vector;
+using std::string;
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -79,13 +85,13 @@ void HybridTS::make_tabu(int i, int j, solution &sol, int curr_tabu, int it)
     tabu_list[j][sol.p[i]] = it + curr_tabu;
 }
 
-solution HybridTS::init()
+void HybridTS::init()
 {
     time_t begin, now;
     time(&begin);
     
     /* -------------- Generate a random initial solution -------------- */
-    solution best(n_facs); best.shuffle(gen);
+    best.shuffle(gen);
     for(int i = 0; i < n_facs; i++)
     {
         for(int j = 0; j < n_facs; j++)
@@ -97,7 +103,6 @@ solution HybridTS::init()
         }
     }
     solution curr = best;
-    //std::cout << "made best\n";
     /* -------------- Generate a random initial solution -------------- */
 
     /* -------------- Matrix of allocation couting -------------- */
@@ -107,7 +112,6 @@ solution HybridTS::init()
 
     for(int i = 0; i < n_facs; i++)
         alloc_count[i][curr.p[i]] += 1;
-    //std::cout << "allo table\n";
     /* -------------- Matrix of allocation couting -------------- */
 
     std::uniform_int_distribution<int> distribution(min_tabu_list, min_tabu_list+delta_tabu);
@@ -118,7 +122,6 @@ solution HybridTS::init()
     /* -------------- Initialize tabu list -------------- */
     for(int i = 0; i < n_facs; i++)
         for(int j = 0; j < n_facs; j++) tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
-    //std::cout << "tabu list inited\n";
     /* -------------- Initialize tabu list -------------- */
 
     bool use_second = (n_facs >= threshold); // Whether to use or not the second aspiration function. If that's the case, this functions takes priority over the classical one
@@ -130,7 +133,6 @@ solution HybridTS::init()
         When it reaches a threshold, the current solution is restarted, together with the tabu list
     */
 
-    int iteration_found = -1; // Iteration when the solution from qaplib (or better) was found
     int num_iter = 0;
     /* 
        Checks if maximum number of iterations criterium is adopted.
@@ -144,21 +146,19 @@ solution HybridTS::init()
         // the minus 1 is becaused the interval is closed
     while(num_iter <= max_iter/5)
     {
-        num_iter++;        
+        num_iter++;
+        if(best.cost <= qaplib_sol) iteration_found = num_iter;
         if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0) curr_tabu = distribution(gen);
 
         int it1 = rand_item(gen);
         int it2 = rand_item(gen); while(it2 == it1) it2 = rand_item(gen);
 
-        //std::cout << "it1 = " << it1 << " it2 = " << it2 << "\n";
-
         it1 = std::min(it1, it2); it2 = std::max(it1, it2);
 
         if(delta[it1][it2] > 0)
         { 
-            dmin = std::min(dmin, delta[it1][it2]); 
-            dmax = std::max(dmax, delta[it1][it2]); 
-            std::cout << ">0 ";
+            dmin = std::min(dmin, delta[it1][it2]);
+            dmax = std::max(dmax, delta[it1][it2]);
         }
 
         bool tabu = isTabu(it1, it2, curr, num_iter);
@@ -185,6 +185,7 @@ solution HybridTS::init()
             {                
                 if(i != it1 and i != it2 and j != it1 and j != it2)
                     delta[i][j] = compute_delta(i, j, it1, it2, curr);
+
                 else delta[i][j] = compute_delta(i, j, curr);
             }
         }
@@ -193,27 +194,18 @@ solution HybridTS::init()
     double t_begin = dmin + (dmax - dmin)/10.0; // Initial temperature
     double t_end = dmin; // Final temperature
     double beta = (t_begin - t_end) / (max_iter * t_begin * t_end );
-    std::cout << "dmin = " << dmin << " dmax = " << dmax << "\n";
-    std::cout << "t_begin = " << t_begin << " t_end = " << t_end;
-    std::cout << "\nbeta = " << beta << "\n";
 
     double temperature = t_begin;
     /* --------------- Initialization of temperature --------------- */
 
-
     while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
     {
-    	std::cout << "---------------------------------------\n";
-        std::cout << "Iteration: " << num_iter << "\n";
-        std::cout << "temperature = " << temperature << "\n";
+    	num_iter++;
 
     	if(best.cost <= qaplib_sol) iteration_found = num_iter;
 
-        if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0)
-        { // Taillard's random update of tabu list size at each 2*s_max iterations
-            curr_tabu = distribution(gen);
-            //std::cout << "------curr tabu: " << curr_tabu << "---------\n";
-        }            
+        if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0) curr_tabu = distribution(gen);
+        // Taillard's random update of tabu list size at each 2*s_max iterations           
         
         int i_retained = -1, j_retained = -1;
         long min_delta = LONG_MAX;
@@ -249,8 +241,6 @@ solution HybridTS::init()
         }
         /* ------------------ Exploration of neighborhood ------------------ */
         
-        std::cout << "i_retained: " << i_retained << " j_retained: " << j_retained << " ";
-
         bool new_sol = false;
 
         if(i_retained == -1) // No move was retained
@@ -259,24 +249,22 @@ solution HybridTS::init()
             curr.comp_cost(flows, distances);
             new_sol = true;
             num_fails = 0;
+            temperature = temperature / (1.0 + beta*temperature);
         }
         else
         {
-            //std::cout << "delta[i_retained][j_retained]: " << delta[i_retained][j_retained] << "\n";
+            long new_cost = curr.cost + delta[i_retained][j_retained];            
             
-            long new_cost = curr.cost + delta[i_retained][j_retained];
-            std::cout << "best.cost = " << best.cost << " new_cost = " << new_cost << "\n";
-            std::cout << "best.cost-new_cost = " << best.cost-new_cost;
-
-            double r = annealing(gen);
-            double f = exp((best.cost-new_cost)/temperature);
-            std::cout << "\nr = " << r << " f = " << f << "\n";
             if(new_cost < best.cost // Improves best solution
                or
-               (num_fails < max_fails and r < f ) )
+               (num_fails < max_fails and annealing(gen) < exp((best.cost-new_cost)/temperature) ) )
                   // Does not improve best solution but is selected to be applied by the simulated annealing criterium
             {
-            	if(best.cost < new_cost) num_fails++; // If that's the case, the second condition was true
+            	if(best.cost < new_cost) // If that's the case, the second condition was true
+                {
+                    num_fails++;
+                    temperature = temperature / (1.0 + beta*temperature);
+                }    
                 // Apply move
                 std::swap(curr.p[i_retained], curr.p[j_retained]);
                 // Update solution value
@@ -284,30 +272,24 @@ solution HybridTS::init()
                 // Update tabu list with the move made
                 make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
 
-                std::cout << "Apply movement\n";
+                //std::cout << "Apply movement\n";
             }
-            else{ // The move was not selected. Do a random restart on the solution
+            else
+            { // The move was not selected. Do a random restart on the solution
                 curr.random_restart(alloc_count, gen);
                 curr.comp_cost(flows, distances);
 
                 new_sol = true;
                 num_fails = 0;
+                temperature = temperature / (1.0 + beta*temperature);
             }            
         }
 
-        std::cout << "num_fails: " << num_fails << "\n";
-
         if (new_sol) // A random solution was created, so the tabu list must be restarted
         {
-            std::cout << "new solution cost: " << curr.cost << "\n";
-        	std::cout << "new random solution made.\n";
-        	for(int i = 0; i < n_facs; i++)
-		    {
-		        for(int j = 0; j < n_facs; j++)
-		        {
-		            tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
-		        }
-		    }
+            for(int i = 0; i < n_facs; i++)
+                for(int j = 0; j < n_facs; j++)
+                    tabu_list[i][j] = 0; // Indicates until which iteration the allocation of j in i will be tabu
         }
 
         for(int i = 0; i < n_facs; i++)
@@ -326,10 +308,24 @@ solution HybridTS::init()
             }
         }
 
-        num_iter++;
-        std::cout << "best cost = " << best.cost << "\n";
-        temperature = temperature / (1.0 + beta*temperature);
     }
+}
 
-    return best;
+void HybridTS::write_results(string &instance)
+{
+    std::ofstream outfile;
+    instance = "../HybridResults/"+instance+".out";
+    outfile.open(instance, std::ios_base::app);
+    std::cout << iteration_found;
+    
+    if (outfile)
+    {
+        outfile << n_facs << " ";
+        for (int i = 0; i < n_facs; ++i)
+        {
+            outfile << best.p[i] << " ";
+        }
+        outfile << best.cost << " " << qaplib_sol << " " << iteration_found << "\n";
+        outfile.close();
+    }
 }
