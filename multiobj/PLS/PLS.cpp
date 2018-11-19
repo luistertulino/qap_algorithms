@@ -112,9 +112,7 @@ time_eval PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
         curr->visited = true;
 
         for (auto sol : candidates)
-        {
             update_nondom_set(sol, non_dominated);
-        }
 
         non_visited.clear();
         for (int i = 0; i < non_dominated.size(); ++i)
@@ -133,7 +131,6 @@ time_eval PLS::init(bool num_avals_crit, int max_num_avals, float time_limit,
                 non_visited.push_back(i);
             }
         }
-
     }
 
     time_eval p(difftime(time(&now),begin), num_avals);

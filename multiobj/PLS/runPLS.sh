@@ -1,4 +1,4 @@
-for n in 20 30 40 50 
+for n in 10 20 30 40 50 
 do	
 	for c in -0.80 0.00
 	do

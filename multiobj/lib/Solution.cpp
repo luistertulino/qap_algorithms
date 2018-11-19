@@ -44,10 +44,13 @@ void Solution::print()
 
 bool operator<=(Solution &s1, Solution &s2)
 {
-    if(s1.objs == s2.objs) return false;
+    bool is_equal = true;
     for (int i = 0; i < s1.objs.size(); ++i)
+    {
         if(s1.objs[i] > s2.objs[i]) return false;
-    return true;
+        is_equal = (s1.objs[i] == s2.objs[i]) and is_equal;
+    }
+    return (not is_equal);
 }
 
 bool operator==(Solution &s1, Solution &s2)
@@ -59,5 +62,5 @@ bool operator==(Solution &s1, Solution &s2)
 
 bool incomparable(Solution &s1, Solution &s2)
 {
-    return !(s1 <= s2) and !(s2 <= s1);
+    return ( not(s1 <= s2) and not(s2 <= s1) );
 }

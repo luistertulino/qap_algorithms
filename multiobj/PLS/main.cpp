@@ -47,19 +47,16 @@ void writedata(int n_objs,
     {
         SolutionPLS *sol = non_dominated_set[i];
         for (auto pi : sol->permutation)
-        {
             outfile << pi << " ";
-        }
+
         outfile << "\n";
         for (auto obj : sol->objs)
-        {
             outfile << obj << " ";
-        }
+
         outfile << "\n";
     }
 
     outfile << "--------------------\n";
-
     outfile.close();
     /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
 
