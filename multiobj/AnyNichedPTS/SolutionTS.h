@@ -52,7 +52,7 @@ class SolutionTS : public Solution
         last_i = l_i;
         last_j = l_j;
         permutation = sol.permutation;
-        swap(permutation[l_i], permutation[l_j]);
+        swap(permutation[l_i], permutattion[l_i], permutation[l_j]);
         objs.resize(n_objs);
         visited = false;
         status = -1;
@@ -91,7 +91,10 @@ class SolutionTS : public Solution
         return *this;
     }
 
-    void compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatrix &distances);    
+    void compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatrix &distances);
+    void compute_objs();  
 };
+
+
 
 #endif

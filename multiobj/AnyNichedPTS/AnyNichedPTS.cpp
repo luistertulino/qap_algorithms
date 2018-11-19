@@ -26,6 +26,11 @@ std::mt19937 gen(rand_dev());
 
 #define DOMINATED -1
 int check_dominance(SolutionTS *solution, vector<SolutionTS*> &non_dominated_set);
+bool order(SolutionTS *s1, SolutionTS *s2)
+{
+    return (s1->objs < s2->objs);
+}
+void kung(vector<SolutionTS*> &non_dominated, vector<bool> &merged, int begin, int end);
 
 time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_limit,
               vector<SolutionTS*> &non_dominated)
@@ -87,12 +92,14 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
             {
                 if(i == curr->last_i and j == curr->last_j) continue;
 
-                SolutionTS *new_sol = new SolutionTS(*curr, i, j);
-                new_sol->compute_objs(*distances, *flows); //new_sol->print();
+                SolutionTS *new_sol = new SolutionTS(*curr);
+                new_sol->compute_deltas(i, j, *flows, *distances);
+                new_sol->>compute_objs();
+                //new_sol->compute_objs(*distances, *flows); //new_sol->print();
                 for(int j = 0; j < n_objs; j++) // Update min e max objs
                 {
-                    min_objs[j] = std::min(min_objs[j], s->objs[j]);
-                    max_objs[j] = std::max(max_objs[j], s->objs[j]);
+                    min_objs[j] = std::min(min_objs[j], new_sol->objs[j]);
+                    max_objs[j] = std::max(max_objs[j], new_sol->objs[j]);
                 }
                 num_avals++;
                 
@@ -149,7 +156,23 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         }
     }
 
-    // >>>>>>>>>> TO DO: REMOVE DOMINATED SOLUTIONS <<<<<<<<<<<
+    /* >>>>>>>>>> REMOVE DOMINATED SOLUTIONS <<<<<<<<<<< */
+    /* >>>>>>>>>>        KUNG'S METHOD       <<<<<<<<<<< */
+    std::sort(non_dominated.begin(), non_dominated.end(), order);
+    vector<bool> merged(non_dominated.size(), true);
+    kung(non_dominated, merged, 0, last(non_dominated));
+    // Now, effectively removes dominated solutions    
+    for(int i = 0; i < non_dominated.size(); i++)
+    {
+        if(merged[i]) continue;
+
+        SolutionTS *t = non_dominated[i];
+        swap(non_dominated[i], non_dominated.back());
+        non_dominated.pop_back();
+        delete t; t = NULL;
+        i--;
+    }
+    std::sort(non_dominated.begin(), non_dominated.end(), order);
 
     time_eval p(difftime(time(&now),begin), num_avals);
     return p;
@@ -280,7 +303,7 @@ bool AnyNichedPTS::update_nondom_set(SolutionTS *solution, vector<SolutionTS*> &
             SolutionTS *rem = non_dominated[i];
             swap(non_dominated[i], non_dominated.back());
             non_dominated.pop_back();
-            delete rem;
+            delete rem; rem = NULL;
             i--;
         }
         else if(solution->status == -1 and *(non_dominated[i]) <= *solution )
@@ -290,4 +313,28 @@ bool AnyNichedPTS::update_nondom_set(SolutionTS *solution, vector<SolutionTS*> &
     }    
     non_dominated.push_back(solution);
     return true;
+}
+
+void kung(vector<SolutionTS*> &non_dominated, vector<bool> &merged, int begin, int end)
+{
+    if(begin == end) return; // Base case
+
+    int middle = begin + (end - begin)/2;
+    kung(non_dominated, merged, begin, middle);
+    kung(non_dominated, merged, middle+1, end);
+
+    
+    for(int i = middle+1; i <= end; i++) // Solution in Bottom
+    {
+        if(not merged[i]) continue; // That solution is already dominated
+        
+        bool merge = true;
+        for(int j = begin; j <= middle and merge; j++) // Solutions in Top
+        {
+            if(not merged[j]) continue; // That solution is already dominated
+            if(*(non_dominated[j]) <= *(non_dominated[i]) ) merge = false;
+        }
+        merged[i] = merge;
+    }  
+
 }

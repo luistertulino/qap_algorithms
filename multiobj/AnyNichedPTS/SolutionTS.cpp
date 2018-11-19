@@ -27,9 +27,30 @@ void SolutionTS::compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatri
     {        
         for(int k = 0; k < n_objs; k++)
         {
-            deltas[k] = 
+            deltas[k] = (flows[k][it1][it1] - flows[k][it2][it2]) *
+                        (distances[ sol.p[it2] ][ sol.p[it2] ] - distances[ sol.p[it1] ][ sol.p[it1] ])
+                        +
+                        (flows[k][it1][it2] - flows[k][it2][it1]) *
+                        (distances[ sol.p[it2] ][ sol.p[it1] ] - distances[ sol.p[it1] ][ sol.p[it2] ]);
+
+            
+            for(int i = 0; i < n_facs; i++)
+            {
+                if(i == it1 or i == it2) continue;
+
+                deltas[k] += (flows[k][i][it1] - flows[k][i][it2]) *
+                             (distances[ sol.p[k] ][ sol.p[it2] ] - distances[ sol.p[i] ][ sol.p[it1] ])
+                             +
+                             (flows[k][it1][i] - flows[k][it2][i]) *
+                             (distances[ sol.p[it2] ][ sol.p[i] ] - distances[ sol.p[it1] ][ sol.p[i] ]);
+            }
+            
         }        
     }
-    
-    
+    last_i = it1; last_j = it2;    
+}
+
+void SolutionTS::compute_objs()
+{
+    for(int k = 0; k < n_objs; k++) objs[k] += deltas[k];
 }
