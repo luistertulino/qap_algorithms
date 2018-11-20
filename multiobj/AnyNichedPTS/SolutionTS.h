@@ -37,7 +37,7 @@ class SolutionTS : public Solution
     {
         n_facs = n_f;
         n_objs = n_o;
-        permutation.resize(n_facs);
+        p.resize(n_facs);
         objs.resize(n_objs);
         visited = false;
         last_i = last_j = -1;
@@ -51,8 +51,8 @@ class SolutionTS : public Solution
         n_objs = sol.n_objs;
         last_i = l_i;
         last_j = l_j;
-        permutation = sol.permutation;
-        swap(permutation[l_i], permutattion[l_i], permutation[l_j]);
+        p = sol.p;
+        swap(p[l_i], p[l_j]);
         objs.resize(n_objs);
         visited = false;
         status = -1;
@@ -79,7 +79,7 @@ class SolutionTS : public Solution
 
     SolutionTS & operator=(SolutionTS &s)
     {
-        permutation = s.permutation;
+        p = s.p;
         objs = s.objs;
         n_facs = s.n_facs;
         n_objs = s.n_objs;
@@ -87,12 +87,13 @@ class SolutionTS : public Solution
         last_j = s.last_j;
         visited = s.visited;
         status = s.status;
-        sol.niche_count;
+        s.niche_count;
         return *this;
     }
 
     void compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatrix &distances);
-    void compute_objs();  
+    void compute_objs();
+    void compute_objs(DistMatrix &dist_mat, FlowMatrices &flow_mats);
 };
 
 

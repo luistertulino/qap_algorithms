@@ -5,6 +5,7 @@
 
 #include <list>
 #include <vector>
+#include <set>
 #include <random>
 #include <algorithm>
 #include <iostream>
@@ -26,10 +27,7 @@ std::mt19937 gen(rand_dev());
 
 #define DOMINATED -1
 int check_dominance(SolutionTS *solution, vector<SolutionTS*> &non_dominated_set);
-bool order(SolutionTS *s1, SolutionTS *s2)
-{
-    return (s1->objs < s2->objs);
-}
+
 void kung(vector<SolutionTS*> &non_dominated, vector<bool> &merged, int begin, int end);
 
 time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_limit,
@@ -58,6 +56,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
 
     list<SolutionTS*> candidates; // For neighbor solutions
 
+    int num_iter = 0;
     while(!non_visited.empty() 
           and 
           ( num_avals_crit ? num_avals < max_num_avals : true ) // The number of evaluations of objs is only considered when num_avals_crit is set to true
@@ -94,7 +93,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
 
                 SolutionTS *new_sol = new SolutionTS(*curr);
                 new_sol->compute_deltas(i, j, *flows, *distances);
-                new_sol->>compute_objs();
+                new_sol->compute_objs();
                 //new_sol->compute_objs(*distances, *flows); //new_sol->print();
                 for(int j = 0; j < n_objs; j++) // Update min e max objs
                 {
@@ -194,9 +193,9 @@ void AnyNichedPTS::make_tabu(int i, int j, SolutionTS &sol, int curr_tabu, int i
 void AnyNichedPTS::random_solution(SolutionTS &s)
 {
     for (int i = 0; i < s.n_facs; ++i)
-        s.permutation[i] = i;
+        s.p[i] = i;
 
-    std::shuffle(s.permutation.begin(), s.permutation.end(), gen);
+    std::shuffle(s.p.begin(), s.p.end(), gen);
     s.compute_objs(*distances, *flows);
 }
 
@@ -254,12 +253,12 @@ int AnyNichedPTS::select_solution(vector<SolutionTS*> &archive, vector<int> &non
     // Step 2: Given the d_ijs, compute the niche count for each non-visited solution
     i = 0;
     vector<double> reverse_count(non_visited.size());
-    for(auto nv : non_visited)
+    for(auto nv : archive)
     {
-        non_dominated[nv]->niche_count = 0;
+        nv->niche_count = 0;
         for(int j = 0; j < ref_size; j++)
-            non_dominated[nv]->niche_count += (d_ijs[i*ref_size + j] <= r_niche ? (1 - d_ijs[i*ref_size + j]/r_niche ) : 0);
-        reverse_count[i] = 1.0 / ( 1.0 + non_dominated[nv]->niche_count);
+            nv->niche_count += (d_ijs[i*ref_size + j] <= r_niche ? (1 - d_ijs[i*ref_size + j]/r_niche ) : 0);
+        reverse_count[i] = 1.0 / ( 1.0 + nv->niche_count);
     }
     /* -------------- For the non-visited solutions, compute their niche count -------------- */
 
@@ -278,20 +277,20 @@ double AnyNichedPTS::dij(SolutionTS &s1, SolutionTS &s2, vector<long> &min_objs,
 
 int check_dominance(SolutionTS *solution, vector<SolutionTS*> &non_dominated_set)
 {
-    int dom_count = 0;
+    int domination_count = 0;
     for (auto sol : non_dominated_set)
     {
         if (*sol <= *solution) return DOMINATED;
         else if(*solution <= *sol) domination_count++;
     }
-    return true;
+    return domination_count;
 }
 
 bool AnyNichedPTS::update_nondom_set(SolutionTS *solution, vector<SolutionTS*> &non_dominated)
 {
     for (int i = 0; i < non_dominated.size(); ++i)
     {        
-        if (solution->permutation == non_dominated[i]->permutation)
+        if (solution->p == non_dominated[i]->p)
         {
             delete solution;
             solution = NULL;
