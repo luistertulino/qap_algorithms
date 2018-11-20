@@ -5,7 +5,6 @@
 #define CASE_ANYWAY 2
 
 #include "../lib/Solution.h"
-#include "../lib/definitions.h"
 
 #include <algorithm>
 #include <vector>
@@ -39,6 +38,7 @@ class SolutionTS : public Solution
         n_objs = n_o;
         p.resize(n_facs);
         objs.resize(n_objs);
+        deltas.resize(n_objs);
         visited = false;
         last_i = last_j = -1;
         status = -1;
@@ -81,6 +81,7 @@ class SolutionTS : public Solution
     {
         p = s.p;
         objs = s.objs;
+        deltas = s.deltas;
         n_facs = s.n_facs;
         n_objs = s.n_objs;
         last_i = s.last_i;
@@ -94,6 +95,8 @@ class SolutionTS : public Solution
     void compute_deltas(int it1, int it2, FlowMatrices &flows, DistMatrix &distances);
     void compute_objs();
     void compute_objs(DistMatrix &dist_mat, FlowMatrices &flow_mats);
+    void print();
+
 };
 
 

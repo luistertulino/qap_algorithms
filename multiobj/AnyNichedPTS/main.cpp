@@ -9,7 +9,6 @@
 #include <sstream>
 #include <fstream>
 
-#include "../lib/definitions.h"
 #include "../lib/readdata.h"
 #include "AnyNichedPTS.h"
 
@@ -17,11 +16,6 @@ using std::string;
 using std::vector;
 using std::list;
 using std::pair;
-
-/*bool order(SolutionTS *s1, SolutionTS *s2)
-{
-    return (s1->objs < s2->objs);
-}*/
 
 void writedata(int n_objs, 
                int n_facs,
@@ -50,12 +44,13 @@ int main(int argc, char const *argv[])
 
         params p;
         read_parameters(argv, p);
+        //p.print();
 
         AnyNichedPTS pts(n_facs, n_objs, &dist_mat, &flow_mats, p);
         vector<SolutionTS*> non_dominated_set;
 
         bool num_avals_crit = true;
-        int num_avals = 500000;
+        int num_avals = 50;
         float time_limit = 500;
         time_eval t = pts.init(num_avals_crit, num_avals, time_limit, non_dominated_set);
 
@@ -71,16 +66,16 @@ void read_parameters(char const *argv[], params &p)
     std::stringstream strv2, strv3, strv4, strv5;
 
     strv2 << argv[2];
-    strv2 >> p.min_tabu_list; std::cout << "min_tabu: " << p.min_tabu_list << "\n";
+    strv2 >> p.min_tabu_list;
 
     strv3 << argv[3];
-    strv3 >> p.delta_tabu; std::cout << "delta: " << p.delta_tabu << "\n";
+    strv3 >> p.delta_tabu;
 
     strv4 << argv[4];
-    strv4 >> p.size_arc_init; std::cout << "size_arc_init: " << p.size_arc_init << "\n";
+    strv4 >> p.size_arc_init;
 
     strv5 << argv[5];
-    strv5 >> p.refset_size; std::cout << "refset_size: " << p.refset_size << "\n";
+    strv5 >> p.refset_size;
 }
 
 void writedata(int n_objs, 

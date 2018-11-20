@@ -3,12 +3,13 @@
 
 #define DISCARDED 0
 
-#include "../lib/definitions.h"
 #include "SolutionTS.h"
 
 #include <list>
 #include <vector>
 #include <utility> // for std::pair
+
+#include <iostream>
 
 using std::list;
 using std::vector;
@@ -22,9 +23,17 @@ struct params
     int delta_tabu;
     int size_arc_init;
     double refset_size;
+
+    void print()
+    {
+        std::cout << "min_tabu_list = " << min_tabu_list << "\n";
+        std::cout << "delta tabu = " << delta_tabu << "\n";
+        std::cout << "size_arc_init = " << size_arc_init << "\n";
+        std::cout << "refset_size = " << refset_size << "\n";
+    }
 };
 
-bool order(SolutionTS *s1, SolutionTS *s2)
+inline bool order(SolutionTS *s1, SolutionTS *s2)
 {
     return (s1->objs < s2->objs);
 }

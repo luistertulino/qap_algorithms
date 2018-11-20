@@ -30,6 +30,8 @@ int check_dominance(SolutionTS *solution, vector<SolutionTS*> &non_dominated_set
 
 void kung(vector<SolutionTS*> &non_dominated, vector<bool> &merged, int begin, int end);
 
+void print_archive(vector<SolutionTS*> &non_dominated, vector<int> &non_visited, vector<long> min_objs, vector<long> max_objs);
+
 time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_limit,
               vector<SolutionTS*> &non_dominated)
 {
@@ -43,8 +45,13 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
     // Step 1: generate a random archive and remove the dominated solutions
     vector<int> non_visited; // Indexes of non-visited solutions
     random_archive(non_dominated, size_arc_init, non_visited, min_objs, max_objs);
+    //print_archive(non_dominated, non_visited, min_objs, max_objs);
 
-    int num_avals = 0;
+    //return time_eval(0,0);
+
+    int num_avals = 0; std::cout << "num_avals = " << num_avals << "\n\n\n\n\n\n\n\n\n\n\n\n";
+
+    //print_archive(non_dominated, non_visited, min_objs, max_objs);
 
     time_t begin, now;
     time(&begin);
@@ -55,6 +62,10 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
     int curr_tabu = distribution(gen); // Current size of tabu list
 
     list<SolutionTS*> candidates; // For neighbor solutions
+    std::cout << "\n\ncandidates = " << candidates.size() << "\n\n";
+
+    //std::cout << "\nnon_dominated.size = " << non_dominated.size() << " wgutfwhribgfrwh";
+    //std::cout << "\nnon_visited.size = " << non_visited.size();
 
     int num_iter = 0;
     while(!non_visited.empty() 
@@ -64,18 +75,19 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
           ( time_limit > 0 and difftime(time(&now),begin) < time_limit ) // The elapsed time is only considered when the parameter is > 0
           )
     {
-        num_iter++;
         // Randomly select the size of tabu list at each s_max iterations, where s_max = minimal tabu list size + delta
         // Inspired by Robust Tabu Search
         if(num_iter % (2*(min_tabu_list+delta_tabu)) == 0) curr_tabu = distribution(gen);        
 
         // Select a random solution based on niche count from non_visited to be examined
         int nv = select_solution(non_dominated, non_visited, min_objs, max_objs);
+        //std::cout << "nv = " << nv;
         int sol_index = non_visited[nv];
+        //std::cout << " sol_index = " << sol_index << "\n";
         swap(non_visited[nv], non_visited.back()); non_visited.pop_back(); // Remove that solution index from non_visited
 
         SolutionTS *curr = non_dominated[sol_index];
-
+        
         // Explore the neighborhood
         /*
           At the beginning, the first-improvement ruled is employed, to quickly find local optima
@@ -89,11 +101,20 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         {
             for (int j = i+1; j < n_facs and not found; ++j)
             {
+                std::cout << "i = " << i << " j = " << j << "\n";
                 if(i == curr->last_i and j == curr->last_j) continue;
 
                 SolutionTS *new_sol = new SolutionTS(*curr);
+                std::cout << "new sol created\n";
                 new_sol->compute_deltas(i, j, *flows, *distances);
                 new_sol->compute_objs();
+                std::cout << "using delta = ";
+                for(auto obj : new_sol->objs) std::cout << obj << " ";
+                
+                new_sol->compute_objs(*distances, *flows);
+                std::cout << "\ncomplete calculation = ";
+                for(auto obj : new_sol->objs) std::cout << obj << " ";
+                std::cout << "\n\n";
                 //new_sol->compute_objs(*distances, *flows); //new_sol->print();
                 for(int j = 0; j < n_objs; j++) // Update min e max objs
                 {
@@ -127,6 +148,8 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         }
         /* ------------ Explore neighborhood of current solution ------------ */
 
+        return time_eval(0,0);
+
         curr->visited = true;
 
         for (auto sol : candidates)
@@ -154,6 +177,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
             }
         }
     }
+    return time_eval(0,0);
 
     /* >>>>>>>>>> REMOVE DOMINATED SOLUTIONS <<<<<<<<<<< */
     /* >>>>>>>>>>        KUNG'S METHOD       <<<<<<<<<<< */
@@ -211,11 +235,17 @@ void AnyNichedPTS::random_archive(vector<SolutionTS*> &archive, int size_arc, ve
             min_objs[j] = std::min(min_objs[j], s->objs[j]);
             max_objs[j] = std::max(max_objs[j], s->objs[j]);
         }
-        if(not update_nondom_set(s, archive)) delete s;
+        if(not update_nondom_set(s, archive)) 
+        {
+            delete s;
+            s = NULL;
+        }
     }
     non_visited.resize(archive.size());
+
     for(int i = 0; i < archive.size(); i++)
         non_visited[i] = i;
+
 }
 
 int AnyNichedPTS::select_solution(vector<SolutionTS*> &archive, vector<int> &non_visited,
@@ -224,7 +254,7 @@ int AnyNichedPTS::select_solution(vector<SolutionTS*> &archive, vector<int> &non
     // Select the solutions (with uniform distribution) to construct the reference set
     int ref_size = int(archive.size()*refset_size); // refset_size is a percentage
     std::set<int> refset;
-    std::uniform_int_distribution<int> rand(0, archive.size());
+    std::uniform_int_distribution<int> rand(0, archive.size()-1);
     for(int i = 0; i < ref_size; i++)
     {
         int r = rand(gen);
@@ -247,18 +277,20 @@ int AnyNichedPTS::select_solution(vector<SolutionTS*> &archive, vector<int> &non
         }
         i++;
     }
+    //std::cout << "end dij calculation\n\n";
     double r_niche = std::accumulate(d_ijs, d_ijs+non_visited.size()*ref_size, 0.0);
-    r_niche /= ref_size * (ref_size - 1);
+    r_niche /= non_visited.size()*ref_size;
 
     // Step 2: Given the d_ijs, compute the niche count for each non-visited solution
     i = 0;
     vector<double> reverse_count(non_visited.size());
-    for(auto nv : archive)
+    for(auto nv : non_visited)
     {
-        nv->niche_count = 0;
+        archive[nv]->niche_count = 0;
         for(int j = 0; j < ref_size; j++)
-            nv->niche_count += (d_ijs[i*ref_size + j] <= r_niche ? (1 - d_ijs[i*ref_size + j]/r_niche ) : 0);
-        reverse_count[i] = 1.0 / ( 1.0 + nv->niche_count);
+             archive[nv]->niche_count += (d_ijs[i*ref_size + j] <= r_niche ? (1 - d_ijs[i*ref_size + j]/r_niche ) : 0);
+        reverse_count[i] = 1.0 / ( 1.0 + archive[nv]->niche_count);
+        i++;
     }
     /* -------------- For the non-visited solutions, compute their niche count -------------- */
 
@@ -272,6 +304,7 @@ double AnyNichedPTS::dij(SolutionTS &s1, SolutionTS &s2, vector<long> &min_objs,
     double dij = 0;
     for(int i = 0; i < n_objs; i++)
         dij += std::pow( ( double(s1.objs[i] - s2.objs[i]) / ( max_objs[i] - min_objs[i] ) ), 2);
+    
     return std::sqrt(dij);
 }
 
@@ -288,18 +321,16 @@ int check_dominance(SolutionTS *solution, vector<SolutionTS*> &non_dominated_set
 
 bool AnyNichedPTS::update_nondom_set(SolutionTS *solution, vector<SolutionTS*> &non_dominated)
 {
+    
     for (int i = 0; i < non_dominated.size(); ++i)
     {        
         if (solution->p == non_dominated[i]->p)
-        {
-            delete solution;
-            solution = NULL;
             return false; // This solution is already in the set. Return false to indicate this.
-        }
         else if ( *solution <= *(non_dominated[i]) )
         {
             // The new solution dominates someone in the set: remove this one.
-            SolutionTS *rem = non_dominated[i];
+            
+            SolutionTS *rem = non_dominated[i];            
             swap(non_dominated[i], non_dominated.back());
             non_dominated.pop_back();
             delete rem; rem = NULL;
@@ -336,4 +367,25 @@ void kung(vector<SolutionTS*> &non_dominated, vector<bool> &merged, int begin, i
         merged[i] = merge;
     }  
 
+}
+
+void print_archive(vector<SolutionTS*> &non_dominated, vector<int> &non_visited, vector<long> min_objs, vector<long> max_objs)
+{
+    std::cout << "non_dominates.size = " << non_dominated.size();
+    std::cout << "\nnon_visited.size = " << non_visited.size() << "\n";
+    for(auto nd : non_dominated)
+    {
+        nd->print();
+    }
+    for(auto nv : non_visited){
+        std::cout << nv << " ";
+    }
+    std::cout << "\nmin_objs: ";
+    for(auto min : min_objs) std::cout << min << " ";
+    std::cout << "\nmax_objs: ";
+    for(auto max : max_objs) std::cout << max << " ";
+    std::cout << "\n";
+
+    std::cout << "\nnon_dominated.size = " << non_dominated.size();
+    std::cout << "\nnon_visited.size = " << non_visited.size();
 }
