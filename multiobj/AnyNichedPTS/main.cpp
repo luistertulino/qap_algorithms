@@ -44,6 +44,7 @@ int main(int argc, char const *argv[])
 
         params p;
         read_parameters(argv, p);
+        return 0;
         //p.print();
 
         AnyNichedPTS pts(n_facs, n_objs, &dist_mat, &flow_mats, p);
@@ -66,16 +67,16 @@ void read_parameters(char const *argv[], params &p)
     std::stringstream strv2, strv3, strv4, strv5;
 
     strv2 << argv[2];
-    strv2 >> p.min_tabu_list;
+    strv2 >> p.min_tabu_list; //std::cout << "min_tabu_list = " << p.min_tabu_list << "\n";
 
     strv3 << argv[3];
-    strv3 >> p.delta_tabu;
+    strv3 >> p.delta_tabu; //std::cout << "delta_tabu = " << p.delta_tabu << "\n";
 
     strv4 << argv[4];
-    strv4 >> p.size_arc_init;
+    strv4 >> p.size_arc_init; //std::cout << "size_arc_init = " << p.size_arc_init << "\n";
 
     strv5 << argv[5];
-    strv5 >> p.refset_size;
+    strv5 >> p.refset_size; //std::cout << "refset_size = " << p.refset_size << "\n";
 }
 
 void writedata(int n_objs, 
@@ -85,7 +86,7 @@ void writedata(int n_objs,
                time_eval &p)
 {
     /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
-    string outf = "../PLSresults/";
+    string outf = "../ANPTSresults/";
     outf += instance;
     outf[last(outf)-1] = 'o'; outf[last(outf)] = 'u'; outf.push_back('t');
 

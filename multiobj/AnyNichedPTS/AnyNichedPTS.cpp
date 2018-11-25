@@ -49,7 +49,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
 
     //return time_eval(0,0);
 
-    int num_avals = 0; std::cout << "num_avals = " << num_avals << "\n\n\n\n\n\n\n\n\n\n\n\n";
+    int num_avals = 0; //std::cout << "num_avals = " << num_avals << "\n\n\n\n\n\n\n\n\n\n\n\n";
 
     //print_archive(non_dominated, non_visited, min_objs, max_objs);
 
@@ -62,7 +62,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
     int curr_tabu = distribution(gen); // Current size of tabu list
 
     list<SolutionTS*> candidates; // For neighbor solutions
-    std::cout << "\n\ncandidates = " << candidates.size() << "\n\n";
+    //std::cout << "\n\ncandidates = " << candidates.size() << "\n\n";
 
     //std::cout << "\nnon_dominated.size = " << non_dominated.size() << " wgutfwhribgfrwh";
     //std::cout << "\nnon_visited.size = " << non_visited.size();
@@ -101,21 +101,14 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         {
             for (int j = i+1; j < n_facs and not found; ++j)
             {
-                std::cout << "i = " << i << " j = " << j << "\n";
+                //std::cout << "i = " << i << " j = " << j << "\n";
                 if(i == curr->last_i and j == curr->last_j) continue;
 
                 SolutionTS *new_sol = new SolutionTS(*curr);
-                std::cout << "new sol created\n";
+                //std::cout << "new sol created\n";
                 new_sol->compute_deltas(i, j, *flows, *distances);
                 new_sol->compute_objs();
-                std::cout << "using delta = ";
-                for(auto obj : new_sol->objs) std::cout << obj << " ";
                 
-                new_sol->compute_objs(*distances, *flows);
-                std::cout << "\ncomplete calculation = ";
-                for(auto obj : new_sol->objs) std::cout << obj << " ";
-                std::cout << "\n\n";
-                //new_sol->compute_objs(*distances, *flows); //new_sol->print();
                 for(int j = 0; j < n_objs; j++) // Update min e max objs
                 {
                     min_objs[j] = std::min(min_objs[j], new_sol->objs[j]);
@@ -148,7 +141,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         }
         /* ------------ Explore neighborhood of current solution ------------ */
 
-        return time_eval(0,0);
+        //return time_eval(0,0);
 
         curr->visited = true;
 
@@ -177,7 +170,6 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
             }
         }
     }
-    return time_eval(0,0);
 
     /* >>>>>>>>>> REMOVE DOMINATED SOLUTIONS <<<<<<<<<<< */
     /* >>>>>>>>>>        KUNG'S METHOD       <<<<<<<<<<< */

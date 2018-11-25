@@ -58,25 +58,7 @@ class SolutionTS : public Solution
         status = -1;
         niche_count = sol.niche_count;
     }
-    /*SolutionTS(SolutionTS &sol, int l_i, int l_j, int _status)
-    {
-        // Creates a new solution based in a solution, the movement made and the variation on objs
-        n_facs = sol.n_facs;
-        n_objs = sol.n_objs;
-        last_i = l_i;
-        last_j = l_j;
-        permutation = sol.permutation;
-        swap(permutation[l_i], permutation[l_j]);
-        objs = sol.objs;
-        for (int k = 0; k < n_objs; ++k)
-        {
-            objs[k] += _deltas[k];
-        }
-        visited = false;
-        status = _status;
-        niche_count = sol.niche_count;
-    }*/
-
+    
     SolutionTS & operator=(SolutionTS &s)
     {
         p = s.p;
@@ -99,6 +81,9 @@ class SolutionTS : public Solution
 
 };
 
+bool operator<=(SolutionTS &s1, SolutionTS &s2);
+bool operator==(SolutionTS &s1, SolutionTS &s2);
+bool incomparable(SolutionTS &s1, SolutionTS &s2);
 
 
 #endif
