@@ -24,6 +24,8 @@ class SolutionTS
     vector<long> deltas; // stores the variation of objs at the previous step of the iteration
     int status; // if 1, that solution is at least non-dominated;
                 // if 2, that solution enters in the archive anyway
+    int dom_count;
+    vector<double> dijs;
     double niche_count;
 
     SolutionTS()
@@ -31,6 +33,7 @@ class SolutionTS
         visited = false;
         last_i = last_j = -1;
         n_facs = n_objs = 0;
+        dom_count = 0;
         niche_count = 1;
     }
     SolutionTS(int n_f, int n_o)
@@ -42,6 +45,7 @@ class SolutionTS
         deltas.resize(n_objs);
         visited = false;
         last_i = last_j = -1;
+        dom_count = 0;
         status = -1;
         niche_count = 1;
     }
@@ -56,6 +60,7 @@ class SolutionTS
         swap(p[l_i], p[l_j]);
         objs.resize(n_objs);
         visited = false;
+        dom_count = 0;
         status = -1;
         niche_count = sol.niche_count;
     }
@@ -71,6 +76,7 @@ class SolutionTS
         last_j = s.last_j;
         visited = s.visited;
         status = s.status;
+        dom_count = 0;
         s.niche_count;
     }
     
@@ -85,6 +91,7 @@ class SolutionTS
         last_j = s.last_j;
         visited = s.visited;
         status = s.status;
+        dom_count = 0;
         s.niche_count;
         return *this;
     }

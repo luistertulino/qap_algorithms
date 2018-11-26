@@ -133,23 +133,23 @@ void SolutionTS::compute_objs(DistMatrix &dist_mat, FlowMatrices &flow_mats)
 
 void SolutionTS::print()
 {
-    ////std::cout << "-----------------------------------------------------------\n";
-    //std::cout << "Permutation: ";
+    
+    std::cout << "Permutation: ";
     for (int i = 0; i < p.size(); ++i)
     {
-        //std::cout << i << "-->" << p[i] << ", ";
+        std::cout << i << "-->" << p[i] << ", ";
     }
-    //std::cout << "\nObjs: ";
+    std::cout << "\nObjs: ";
     for (int i = 0; i < objs.size(); ++i)
     {
-        //std::cout << objs[i] << " ";
+        std::cout << objs[i] << " ";
     }
-    //std::cout << "\nlast_i = " << last_i << " last_j = " << last_j;
-    //std::cout << "\ndeltas: ";
+    std::cout << "\nlast_i = " << last_i << " last_j = " << last_j;
+    std::cout << "\ndeltas: ";
     for (int i = 0; i < deltas.size(); ++i)
     {
-        //std::cout << deltas[i] << " ";
+        std::cout << deltas[i] << " ";
     }
-    //std::cout << "\n\n";
-    ////std::cout << "\n-----------------------------------------------------------\n";
+    std::cout << "\n\n";
+    std::cout << "\n-----------------------------------------------------------\n";
 }
