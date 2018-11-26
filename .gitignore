@@ -3,7 +3,7 @@ metaheuristics/script.jl
 metaheuristics/instances/
 metaheuristics/solutions
 metaheuristics/lib/hungarian-algorithm
-metaheuristics/tuning/
+metaheuristics/hybrid/tuning/
 *exec
 *.o
 *results.txt
