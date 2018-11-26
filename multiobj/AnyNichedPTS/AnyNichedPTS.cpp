@@ -49,7 +49,7 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
 
     //return time_eval(0,0);
 
-    int num_avals = 0; //std::cout << "num_avals = " << num_avals << "\n\n\n\n\n\n\n\n\n\n\n\n";
+    int num_avals = 0; ////std::cout << "num_avals = " << num_avals << "\n\n\n\n\n\n\n\n\n\n\n\n";
 
     //print_archive(non_dominated, non_visited, min_objs, max_objs);
 
@@ -62,17 +62,18 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
     int curr_tabu = distribution(gen); // Current size of tabu list
 
     list<SolutionTS*> candidates; // For neighbor solutions
-    //std::cout << "\n\ncandidates = " << candidates.size() << "\n\n";
+    ////std::cout << "\n\ncandidates = " << candidates.size() << "\n\n";
 
-    //std::cout << "\nnon_dominated.size = " << non_dominated.size() << " wgutfwhribgfrwh";
-    //std::cout << "\nnon_visited.size = " << non_visited.size();
+    ////std::cout << "\nnon_dominated.size = " << non_dominated.size() << " wgutfwhribgfrwh";
+    ////std::cout << "\nnon_visited.size = " << non_visited.size();
 
+    ////std::cout << "\n\n\n MAIN LOOṔ \n\n\n";
     int num_iter = 0;
     while(!non_visited.empty() 
           and 
           ( num_avals_crit ? num_avals < max_num_avals : true ) // The number of evaluations of objs is only considered when num_avals_crit is set to true
           and
-          ( time_limit > 0 and difftime(time(&now),begin) < time_limit ) // The elapsed time is only considered when the parameter is > 0
+          ( time_limit > 0 ? difftime(time(&now),begin) < time_limit : true ) // The elapsed time is only considered when the parameter is > 0
           )
     {
         // Randomly select the size of tabu list at each s_max iterations, where s_max = minimal tabu list size + delta
@@ -81,12 +82,15 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
 
         // Select a random solution based on niche count from non_visited to be examined
         int nv = select_solution(non_dominated, non_visited, min_objs, max_objs);
-        //std::cout << "nv = " << nv;
+        ////std::cout << "nv = " << nv;
         int sol_index = non_visited[nv];
-        //std::cout << " sol_index = " << sol_index << "\n";
+        ////std::cout << " sol_index = " << sol_index << "\n";
         swap(non_visited[nv], non_visited.back()); non_visited.pop_back(); // Remove that solution index from non_visited
 
+        ////std::cout << "********** CURRENT SOLUTION **********\n";
         SolutionTS *curr = non_dominated[sol_index];
+        //curr->print();
+        ////std::cout << "********** CURRENT SOLUTION **********\n";
         
         // Explore the neighborhood
         /*
@@ -96,18 +100,34 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
         */
         bool found = false;
 
+        ////std::cout << "********** neighbors **********\n";
+
+        bool diff = false;
         /* ------------ Explore neighborhood of current solution ------------ */
         for (int i = 0; i < n_facs and not found; ++i)
         {
             for (int j = i+1; j < n_facs and not found; ++j)
             {
-                //std::cout << "i = " << i << " j = " << j << "\n";
+                //////std::cout << "i = " << i << " j = " << j << "\n";
                 if(i == curr->last_i and j == curr->last_j) continue;
 
                 SolutionTS *new_sol = new SolutionTS(*curr);
-                //std::cout << "new sol created\n";
+                diff = (new_sol->last_i != -1 and new_sol->last_j != -1 and
+                    i != new_sol->last_i and 
+                             i != new_sol->last_j and
+                             j != new_sol->last_i and
+                             j != new_sol->last_j);
+                ////std::cout << "new sol created\n";
                 new_sol->compute_deltas(i, j, *flows, *distances);
                 new_sol->compute_objs();
+                //std::cout << "------------------\nusing deltas:\n";
+                //new_sol->print();
+                //std::cout << "from scratch:\n";
+                //new_sol->compute_objs(*distances, *flows);
+                //new_sol->print();
+                //std::cout << "------------------\n\n";
+
+                //if(diff) return time_eval(0,0);
                 
                 for(int j = 0; j < n_objs; j++) // Update min e max objs
                 {
@@ -137,11 +157,12 @@ time_eval AnyNichedPTS::init(bool num_avals_crit, int max_num_avals, float time_
                     delete new_sol;
                     continue;
                 }
+
+                //if(found) //std::cout << "found improvement\n";
             }
         }
         /* ------------ Explore neighborhood of current solution ------------ */
-
-        //return time_eval(0,0);
+        //std::cout << "**********end of neighbors **********\n\n\n";
 
         curr->visited = true;
 
@@ -269,7 +290,7 @@ int AnyNichedPTS::select_solution(vector<SolutionTS*> &archive, vector<int> &non
         }
         i++;
     }
-    //std::cout << "end dij calculation\n\n";
+    ////std::cout << "end dij calculation\n\n";
     double r_niche = std::accumulate(d_ijs, d_ijs+non_visited.size()*ref_size, 0.0);
     r_niche /= non_visited.size()*ref_size;
 

@@ -44,15 +44,13 @@ int main(int argc, char const *argv[])
 
         params p;
         read_parameters(argv, p);
-        return 0;
-        //p.print();
 
         AnyNichedPTS pts(n_facs, n_objs, &dist_mat, &flow_mats, p);
         vector<SolutionTS*> non_dominated_set;
 
         bool num_avals_crit = true;
-        int num_avals = 50;
-        float time_limit = 500;
+        int num_avals = 500000;
+        float time_limit = 300;
         time_eval t = pts.init(num_avals_crit, num_avals, time_limit, non_dominated_set);
 
         std::sort(non_dominated_set.begin(), non_dominated_set.end(), order);

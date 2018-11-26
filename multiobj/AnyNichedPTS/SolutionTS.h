@@ -4,15 +4,16 @@
 #define CASE_ASPIRED 1
 #define CASE_ANYWAY 2
 
-#include "../lib/Solution.h"
+#include "../lib/definitions.h"
 
 #include <algorithm>
 #include <vector>
+#include <iostream>
 
 using std::swap;
 using std::vector;
 
-class SolutionTS : public Solution
+class SolutionTS
 {
   public:
     int n_facs, n_objs;
@@ -20,7 +21,7 @@ class SolutionTS : public Solution
     vector<long> objs; // Objective functions
     bool visited; // true if this solution was explored; false otherwise
     int last_i, last_j; // Indicates the last movement made in the solution
-    vector<int> deltas; // stores the variation of objs at the previous step of the iteration
+    vector<long> deltas; // stores the variation of objs at the previous step of the iteration
     int status; // if 1, that solution is at least non-dominated;
                 // if 2, that solution enters in the archive anyway
     double niche_count;
@@ -57,6 +58,20 @@ class SolutionTS : public Solution
         visited = false;
         status = -1;
         niche_count = sol.niche_count;
+    }
+    SolutionTS(SolutionTS &s)
+    {
+        //std::cout << "make a new solution by copy\n";
+        p = s.p;
+        objs = s.objs;
+        deltas = s.deltas;
+        n_facs = s.n_facs;
+        n_objs = s.n_objs;
+        last_i = s.last_i;
+        last_j = s.last_j;
+        visited = s.visited;
+        status = s.status;
+        s.niche_count;
     }
     
     SolutionTS & operator=(SolutionTS &s)
