@@ -3,18 +3,40 @@
 
 #define DISCARDED 0
 
-#include "../lib/definitions.h"
 #include "SolutionTS.h"
 
 #include <list>
 #include <vector>
 #include <utility> // for std::pair
 
+#include <iostream>
+
 using std::list;
 using std::vector;
 using std::pair;
 
 typedef pair<double,int> time_eval;
+
+struct params
+{
+    int min_tabu_list;
+    int delta_tabu;
+    int size_arc_init;
+    double refset_size;
+
+    void print()
+    {
+        std::cout << "min_tabu_list = " << min_tabu_list << "\n";
+        std::cout << "delta tabu = " << delta_tabu << "\n";
+        std::cout << "size_arc_init = " << size_arc_init << "\n";
+        std::cout << "refset_size = " << refset_size << "\n";
+    }
+};
+
+inline bool order(SolutionTS *s1, SolutionTS *s2)
+{
+    return (s1->objs < s2->objs);
+}
 
 class AnyNichedPTS
 {
@@ -28,13 +50,17 @@ class AnyNichedPTS
     int delta_tabu;    // Maximum variation of tabu list size
     Matrix tabu_list;
 
-  	AnyNichedPTS(int n_f, int n_o, DistMatrix *dist, FlowMatrices *_flows, 
-      int refset_size, int size_arc_init) /* >>>>>> Change it later to receive a struct with all parameters <<<<<< */
+  	AnyNichedPTS(int n_f, int n_o, DistMatrix *dist, FlowMatrices *_flows, params &p) /* >>>>>> Change it later to receive a struct with all parameters <<<<<< */
     {
         n_facs = n_f;
         n_objs = n_o;
         distances = dist;
         flows = _flows;
+
+        size_arc_init = p.size_arc_init;
+        refset_size = p.refset_size;
+        min_tabu_list = p.min_tabu_list;
+        delta_tabu = p.delta_tabu;
 
         tabu_list.resize(n_facs, vector<int>(n_facs, 0));
     }
