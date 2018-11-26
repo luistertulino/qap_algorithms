@@ -35,15 +35,19 @@ int main(int argc, char const *argv[])
     if (argc > 1)
     {
         file = string(argv[1]);
-        string pfile = "../instances/"+file+".dat";
-        string sfile = "../solutions/"+file+".sln";
-        string rfile = "results/"+file+".out";
+        string sfile = file;
+        size_t index = 0; index = sfile.find("instances", index);
+        sfile.replace(index, 9, "solutions");
+        index = sfile.find("dat", index);
+        sfile.replace(index, 3, "sln");
+        
+        //string rfile = "results/"+file+".out";
 
         int n_facs;
 
         if (file.find("chr") != std::string::npos or file.find("scr") != std::string::npos)
         {
-            int read = read_data(pfile, params.n_facs, flow_mat, dist_mat);
+            int read = read_data(file, params.n_facs, flow_mat, dist_mat);
             if (read != READING_OK)
             {
                 std::cout << "Error in reading instance " << file << ".\n";
@@ -51,15 +55,13 @@ int main(int argc, char const *argv[])
             }
         }
         else{
-            int read = read_data(pfile, params.n_facs, dist_mat, flow_mat);
+            int read = read_data(file, params.n_facs, dist_mat, flow_mat);
             if (read != READING_OK)
             {
                 std::cout << "Error in reading instance " << file << ".\n";
                 return -1;
             }
         }
-
-        std::cout << params.n_facs << "\n";
 
         long sol = read_solution(sfile);
         if (sol == ERROR_READING_DATA)
@@ -89,9 +91,7 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    //std::cout << "going to construct ts\n";
     HybridTS ts(params, dist_mat, flow_mat);
-    //std::cout << "init method\n";
     ts.init();
     ts.write_results(file);
 }
@@ -101,19 +101,19 @@ bool read_parameters(char const *argv[], prob_params &params)
     std::stringstream strv2, strv3, strv4, strv5, strv6;
 
     strv2 << argv[2];
-    strv2 >> params.min_tabu_list; std::cout << "min_tabu: " << params.min_tabu_list << "\n";
+    strv2 >> params.min_tabu_list; //std::cout << "min_tabu: " << params.min_tabu_list << "\n";
 
     strv3 << argv[3];
-    strv3 >> params.delta; std::cout << "delta: " << params.delta << "\n";
+    strv3 >> params.delta; //std::cout << "delta: " << params.delta << "\n";
 
     strv4 << argv[4];
-    strv4 >> params.max_fails; std::cout << "max_fails: " << params.max_fails << "\n";
+    strv4 >> params.max_fails; //std::cout << "max_fails: " << params.max_fails << "\n";
 
     strv5 << argv[5];
-    strv5 >> params.threshold; std::cout << "threshold: " << params.threshold << "\n";
+    strv5 >> params.threshold; //std::cout << "threshold: " << params.threshold << "\n";
 
     strv6 << argv[6];
-    strv6 >> params.aspiration; std::cout << "aspiration: " << params.aspiration << "\n";
+    strv6 >> params.aspiration; //std::cout << "aspiration: " << params.aspiration << "\n";
 
     return true;
 }

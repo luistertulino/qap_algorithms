@@ -19,7 +19,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 
 float time_limit = 1000;
-int max_iter = 200; // 1 million
+int max_iter = 100000;
 bool max_iter_crit = true;
 
 
@@ -144,7 +144,7 @@ void HybridTS::init()
     long dmin = LONG_MAX; long dmax = 0;
     std::uniform_int_distribution<int> rand_item(0, n_facs-1); // The swap will be random
         // the minus 1 is becaused the interval is closed
-    while(num_iter <= max_iter/5)
+    while(num_iter <= max_iter/100)
     {
         num_iter++;
         if(best.cost <= qaplib_sol) iteration_found = num_iter;
@@ -311,21 +311,30 @@ void HybridTS::init()
     }
 }
 
-void HybridTS::write_results(string &instance)
+void HybridTS::write_results(string file)
 {
+    
+    for(int i = 0; i < 4; i++) file.pop_back();
+    string instance = "";
+    while(file.back() != '/')
+    {
+        instance.insert(instance.begin(), file.back());
+        file.pop_back();
+    }
+    //std::cout << instance << "\n";
+    
     std::ofstream outfile;
     instance = "../HybridResults/"+instance+".out";
     outfile.open(instance, std::ios_base::app);
-    std::cout << iteration_found;
+    //std::cout << iteration_found << "\n";
     
     if (outfile)
     {
         outfile << n_facs << " ";
-        for (int i = 0; i < n_facs; ++i)
-        {
-            outfile << best.p[i] << " ";
-        }
+        for (int i = 0; i < n_facs; ++i) outfile << best.p[i] << " ";
         outfile << best.cost << " " << qaplib_sol << " " << iteration_found << "\n";
         outfile.close();
     }
+
+    std::cout << best.cost;
 }
