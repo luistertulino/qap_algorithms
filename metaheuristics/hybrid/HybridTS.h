@@ -22,6 +22,7 @@ class HybridTS
     int max_fails;     // Maximum number of fails in improving best solution: when an improvement is not made, the simulated annealing is used
     int threshold;     // The minimum problem size to use second aspiration function
     int aspiration;    // The extra iterations of second aspiration function
+    int max_iter;
     long qaplib_sol;    // Solution value available in solution file from QAPLIB
     Matrix distances, flows;
     Matrix tabu_list;

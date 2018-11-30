@@ -19,6 +19,7 @@ struct prob_params
 	int max_fails;
 	int threshold;
 	int aspiration;
+	int max_iter;
 };
 
 #endif
