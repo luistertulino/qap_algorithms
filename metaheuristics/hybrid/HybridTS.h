@@ -60,7 +60,7 @@ class HybridTS
     long compute_delta(int i, int j, int r, int s, solution &sol);
     void update_delta_matrix(int i, int j, solution &s);
 
-    void write_results(string &instance);
+    void write_results(string file);
 };
 
 #endif

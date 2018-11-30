@@ -40,6 +40,7 @@ inline bool order(SolutionTS *s1, SolutionTS *s2)
 
 class AnyNichedPTS
 {
+    int dominated_solutions_in_archive;
   public:
     int n_facs, n_objs;
     DistMatrix *distances;

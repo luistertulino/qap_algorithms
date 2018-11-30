@@ -17,10 +17,20 @@ using std::vector;
 using std::list;
 using std::pair;
 
+// Not using this method for now
+/*
 void writedata(int n_objs, 
                int n_facs,
                string &instance, 
                vector<SolutionTS*> &non_dominated_set,
+               time_eval &p);
+*/
+
+// Using this one
+void writedata(int n_objs, 
+               int n_facs,
+               string &instance, 
+               list<SolutionTS*> &non_dominated_set,
                time_eval &p);
 
 void read_parameters(char const *argv[], params &p);
@@ -55,7 +65,25 @@ int main(int argc, char const *argv[])
 
         std::sort(non_dominated_set.begin(), non_dominated_set.end(), order);
 
-        writedata(n_objs, n_facs, instance, non_dominated_set, t);
+        list<SolutionTS*> nond;
+        for(auto sol : non_dominated_set)
+        {
+            bool ins_sol = true;
+            if(not nond.empty())
+            {
+                for(auto nd : nond)
+                {
+                    if (*nd <= *sol)
+                    {
+                        ins_sol = false;
+                        break;
+                    }
+                }
+            }
+            if(ins_sol) nond.push_back(sol);            
+        }
+        writedata(n_objs, n_facs, instance, nond, t);
+        //writedata(n_objs, n_facs, instance, non_dominated_set, t);
     }
     return 0;
 }
@@ -80,10 +108,54 @@ void read_parameters(char const *argv[], params &p)
 void writedata(int n_objs, 
                int n_facs,
                string &instance, 
-               vector<SolutionTS*> &non_dominated_set,
+               list<SolutionTS*> &non_dominated_set,
                time_eval &p)
 {
     /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
+    string outf = "../ANPTSresults/";
+    outf += instance;
+    outf[last(outf)-1] = 'o'; outf[last(outf)] = 'u'; outf.push_back('t');
+
+    std::ofstream outfile;
+    outfile.open(outf, std::ios::app);
+
+    if (!outfile.is_open())
+    {
+        std::cout << "Error in creating and opening " << outf << " file.\n";
+        return;
+    }
+
+    outfile << non_dominated_set.size() << " " << p.first << " " << p.second << " " << n_facs << " " << n_objs << "\n";
+
+    for (auto sol : non_dominated_set)
+    {
+        for (auto pi : sol->p)
+        {
+            outfile << pi << " ";
+        }
+        outfile << "\n";
+        for (auto obj : sol->objs)
+        {
+            outfile << obj << " ";
+        }
+        outfile << "\n";
+    }
+
+    outfile << "--------------------\n";
+
+    outfile.close();
+    /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
+}
+
+// Not using this method
+/*
+void writedata(int n_objs, 
+               int n_facs,
+               string &instance, 
+               vector<SolutionTS*> &non_dominated_set,
+               time_eval &p)
+{
+    
     string outf = "../ANPTSresults/";
     outf += instance;
     outf[last(outf)-1] = 'o'; outf[last(outf)] = 'u'; outf.push_back('t');
@@ -117,5 +189,4 @@ void writedata(int n_objs,
     outfile << "--------------------\n";
 
     outfile.close();
-    /*----------------------- PRINT NON-DOMINATED SET -----------------------*/
-}
+}*/

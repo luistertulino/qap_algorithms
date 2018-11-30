@@ -72,7 +72,7 @@ int read_data(string &file, int &n_facs, Matrix &dist_mat, Matrix &flow_mat)
             split_string(line, words);
 
             n_facs = std::stoi(words[0], nullptr);
-            std::cout << n_facs;
+            //std::cout << n_facs;
         }
         else
         {
