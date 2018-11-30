@@ -35,7 +35,7 @@ int main(int argc, char const *argv[])
     if (argc > 1)
     {
         file = string(argv[1]);
-        std::cout << file << "\n";
+        //std::cout << file << "\n";
         string sfile = file;
         size_t index = 0; index = sfile.find("instances", index);
         sfile.replace(index, 9, "solutions");
@@ -64,9 +64,9 @@ int main(int argc, char const *argv[])
             }
         }
 
-        std::cout << "read_solution\n";
+        //std::cout << "read_solution\n";
         long sol = read_solution(sfile);
-        std::cout << "read_solution\n";
+        //std::cout << "read_solution\n";
         if (sol == ERROR_READING_DATA)
         {
             std::cout << "Error in reading solution of " << file << ".\n";

@@ -336,5 +336,5 @@ void HybridTS::write_results(string file)
         outfile.close();
     }
 
-    std::cout << best.cost;
+    //std::cout << best.cost;
 }
