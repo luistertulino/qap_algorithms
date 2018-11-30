@@ -19,9 +19,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 
 float time_limit = 1000;
-int max_iter = 10000;
 bool max_iter_crit = true;
-
 
 /*--------------------------------------------------------------*/
 /*       compute the cost difference if elements i and j        */

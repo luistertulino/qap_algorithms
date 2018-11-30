@@ -37,6 +37,7 @@ class HybridTS
         max_fails = params.max_fails;
         threshold = params.threshold;
         aspiration = params.aspiration;
+        max_iter = params.max_iter;
         qaplib_sol = params.qaplib_sol;
         distances = dist;
         flows = flow;

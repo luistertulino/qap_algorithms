@@ -98,7 +98,7 @@ int main(int argc, char const *argv[])
 
 bool read_parameters(char const *argv[], prob_params &params)
 {
-    std::stringstream strv2, strv3, strv4, strv5, strv6;
+    std::stringstream strv2, strv3, strv4, strv5, strv6, strv7;
 
     strv2 << argv[2];
     strv2 >> params.min_tabu_list; //std::cout << "min_tabu: " << params.min_tabu_list << "\n";
@@ -114,6 +114,9 @@ bool read_parameters(char const *argv[], prob_params &params)
 
     strv6 << argv[6];
     strv6 >> params.aspiration; //std::cout << "aspiration: " << params.aspiration << "\n";
+
+    strv7 << argv[7];
+    strv6 >> params.max_iter;
 
     return true;
 }
