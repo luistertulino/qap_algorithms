@@ -19,7 +19,7 @@ std::random_device rd;
 std::mt19937 gen(rd());
 
 float time_limit = 1000;
-int max_iter = 100000;
+int max_iter = 10000;
 bool max_iter_crit = true;
 
 
@@ -256,6 +256,8 @@ void HybridTS::init()
             long new_cost = curr.cost + delta[i_retained][j_retained];            
             
             if(new_cost < best.cost // Improves best solution
+               or
+               num_fails < max_fails and new_cost < curr.cost
                or
                (num_fails < max_fails and annealing(gen) < exp((best.cost-new_cost)/temperature) ) )
                   // Does not improve best solution but is selected to be applied by the simulated annealing criterium
