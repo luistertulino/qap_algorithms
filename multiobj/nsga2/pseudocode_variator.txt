@@ -1,0 +1,34 @@
+it = 0
+while(it < max_it)
+{
+    leia estado
+    se state == 2: (cruzamento e mutação)
+        leia novos indivíduos do arquivo de população
+        atualize a população:
+            - se o índice do indivíduo corresponder a um índice da lista de filhos, adicione-o à população
+            - se um indivíduo da população antiga não estiver na nova população, remova-o, e verifique se ele está no arquivo. se não estiver destrua-o
+        leia arquivo dos selecionados para cruzamento
+        inicie a população de filhos como vazia
+        realize o cruzamento dos pais, e submeta os filhos para mutação (busca local)
+        Adicione todas as novas soluções em conjunto temporário
+        Faça a ordenação não-dominada desse conjunto
+        Adicione as soluções não-dominadas no arquivo externo
+
+        Selecione n (tamanho do problema) soluções para compor o conjunto de filhos:
+            - Se houver menos soluções não-dominadas que n: adicione todas no conjunto de filhos e as restantes selecione dos próximos níveis de dominância pelo rank de dominância (soluções menos dominadas são selecionadas primeiro)
+
+            - Se houver mais soluções dominadas que n: selecione as que dominam mais soluções (ideia futura: truncamento do SPEA2)
+
+        Adicione os n filhos no arquivo de filhos
+            - O índice registrado será: seu índice na lista de filhos + tamanho da população
+        As soluções dominadas que não foram para o arquivo de filhos devem ser destruídas
+        As soluções não-dominadas que não foram para o arquivo de filhos devem ser verificadas se estão no arquivo externo. Se não estiver, destrua-as.
+
+        atualize o estado para 3
+}
+
+atualize o estado para 6 (encerre nsga2)
+
+enquanto(state != 7) atualize estado (espere o nsga2 encerrar)
+
+reporte o arquivo externo

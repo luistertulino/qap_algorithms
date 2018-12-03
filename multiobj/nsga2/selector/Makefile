@@ -10,7 +10,7 @@ CFLAGS = -g -Wall -pedantic
 SEL_OBJECTS = nsga2_functions.o nsga2_io.o nsga2.o
 
 nsga2 : $(SEL_OBJECTS)
-	$(CC) $(CFLAGS) -lm $(SEL_OBJECTS) -o nsga2
+	$(CC) $(CFLAGS) $(SEL_OBJECTS) -lm -o nsga2
 
 nsga2_functions.o : nsga2_functions.c nsga2.h
 	$(CC) $(CFLAGS) -c nsga2_functions.c 
