@@ -94,7 +94,6 @@ int main(int argc, char const *argv[])
         return -1;
     }
 
-    
 
     HybridTS ts(params, dist_mat, flow_mat);
     ts.init();
@@ -123,7 +122,7 @@ bool read_parameters(char const *argv[], prob_params &params)
     strv6 >> params.aspiration; //std::cout << "aspiration: " << params.aspiration << "\n";
 
     strv7 << argv[7];
-    strv6 >> params.max_iter;
+    strv7 >> params.max_iter; //std::cout << "aspiration: " << params.max_iter << "\n";
 
     return true;
 }

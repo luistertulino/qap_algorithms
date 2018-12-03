@@ -217,8 +217,8 @@ void HybridTS::init()
             {
                 bool tabu = isTabu(i, j, curr, num_iter);
                 aspired = (use_second and // Second aspiration function by Taillard. It is only used for "big" problems
-                           (tabu_list[i][ curr.p[j] ] < num_iter - aspiration) and
-                           (tabu_list[j][ curr.p[i] ] < num_iter - aspiration) 
+                           (tabu_list[i][ curr.p[j] ] < num_iter - aspiration or
+                            tabu_list[j][ curr.p[i] ] < num_iter - aspiration) 
                            or
                            curr.cost + delta[i][j] < best.cost);
 
@@ -295,7 +295,11 @@ void HybridTS::init()
         for(int i = 0; i < n_facs; i++)
             alloc_count[i][curr.p[i]] += 1;
 
-        if(curr.cost < best.cost) best = curr;
+        if(curr.cost < best.cost)
+        {
+            best = curr;
+            num_fails = 0;
+        }
 
         // Update delta table
         for(int i = 0; i < n_facs; i++)
@@ -324,7 +328,7 @@ void HybridTS::write_results(string file)
     //std::cout << instance << "\n";
     
     std::ofstream outfile;
-    instance = "../HybridResults/"+instance+".out";
+    instance = "../HybridResults/"+(std::to_string(max_iter))+"/"+instance+".out";
     outfile.open(instance, std::ios_base::app);
     //std::cout << iteration_found << "\n";
     

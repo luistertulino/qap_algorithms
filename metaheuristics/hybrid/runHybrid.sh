@@ -26,10 +26,16 @@ delta=23
 max_fails=167
 threshold=56
 aspiration=62
-max_iter=50000
+#max_iter=1000000
 
-for inst in $instances; do
+for max_iter in 50000;
+do
+    for inst in $instances; do
 	for (( i = 0; i < 30; i++ )); do
 		./exec $inst $min_tabu $delta $max_fails $threshold $aspiration $max_iter
 	done
+	echo "done all of 30 of ${inst}"
+    done
 done
+
+python sendemail.py
