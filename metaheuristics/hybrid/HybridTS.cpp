@@ -142,7 +142,7 @@ void HybridTS::init()
     long dmin = LONG_MAX; long dmax = 0;
     std::uniform_int_distribution<int> rand_item(0, n_facs-1); // The swap will be random
         // the minus 1 is becaused the interval is closed
-    while(num_iter <= max_iter/100)
+    /*while(num_iter <= max_iter/100)
     {
         num_iter++;
         if(best.cost <= qaplib_sol) iteration_found = num_iter;
@@ -193,7 +193,7 @@ void HybridTS::init()
     double t_end = dmin; // Final temperature
     double beta = (t_begin - t_end) / (max_iter * t_begin * t_end );
 
-    double temperature = t_begin;
+    double temperature = t_begin;*/
     /* --------------- Initialization of temperature --------------- */
 
     while( max_iter_crit ? num_iter <= max_iter : difftime(time(&now),begin) < time_limit )
@@ -243,15 +243,16 @@ void HybridTS::init()
 
         if(i_retained == -1) // No move was retained
         {
-            curr.random_restart(alloc_count, gen);
+            /*curr.random_restart(alloc_count, gen);
             curr.comp_cost(flows, distances);
             new_sol = true;
             num_fails = 0;
-            temperature = temperature / (1.0 + beta*temperature);
+            temperature = temperature / (1.0 + beta*temperature);*/
+            continue;
         }
         else
         {
-            long new_cost = curr.cost + delta[i_retained][j_retained];            
+            /*long new_cost = curr.cost + delta[i_retained][j_retained];            
             
             if(new_cost < best.cost // Improves best solution
                or
@@ -264,7 +265,7 @@ void HybridTS::init()
                 {
                     num_fails++;
                     temperature = temperature / (1.0 + beta*temperature);
-                }    
+                }*/    
                 // Apply move
                 std::swap(curr.p[i_retained], curr.p[j_retained]);
                 // Update solution value
@@ -273,7 +274,7 @@ void HybridTS::init()
                 make_tabu(i_retained, j_retained, curr, curr_tabu, num_iter);
 
                 //std::cout << "Apply movement\n";
-            }
+            /*}
             else
             { // The move was not selected. Do a random restart on the solution
                 curr.random_restart(alloc_count, gen);
@@ -282,10 +283,10 @@ void HybridTS::init()
                 new_sol = true;
                 num_fails = 0;
                 temperature = temperature / (1.0 + beta*temperature);
-            }            
+            }*/            
         }
 
-        if (new_sol) // A random solution was created, so the tabu list must be restarted
+        /*if (new_sol) // A random solution was created, so the tabu list must be restarted
         {
             for(int i = 0; i < n_facs; i++)
                 for(int j = 0; j < n_facs; j++)
@@ -293,12 +294,12 @@ void HybridTS::init()
         }
 
         for(int i = 0; i < n_facs; i++)
-            alloc_count[i][curr.p[i]] += 1;
+            alloc_count[i][curr.p[i]] += 1;*/
 
         if(curr.cost < best.cost)
         {
             best = curr;
-            num_fails = 0;
+            //num_fails = 0;
         }
 
         // Update delta table
