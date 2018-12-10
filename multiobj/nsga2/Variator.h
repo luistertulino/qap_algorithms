@@ -61,7 +61,7 @@ class Variator
     void init(vector<Individual*> &non_dominated);
     void random_pop(vector<Individual*> &pop, vector<Individual*> &external_archive);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated);
-    bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated);
+    bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated, list<Individual*> &dominated);
     
 };
 
