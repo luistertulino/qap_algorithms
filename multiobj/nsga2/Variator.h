@@ -10,10 +10,12 @@
 #include <vector>
 #include <list>
 #include <iostream>
+#include <string>
 
 using std::swap;
 using std::vector;
 using std::list;
+using std::string;
 
 struct params
 {
@@ -23,10 +25,11 @@ struct params
     int offspring_size;          // Number of offspring to be produced
     double diversification_prob; // Probability of diversification in crossover: in the [0.0, 1.0) interval
     double intensification_prob; // Probability of intensification in crossover: in the [0.0, 1.0) interval
+    int num_iter;
 
     params(){}
 
-    params(int gen, int pop, int p, int o, double dprob, double iprob)
+    params(int gen, int pop, int p, int o, double dprob, double iprob, int n_iter)
     {
         generated_solutions_num = gen;
         pop_size = pop;
@@ -34,6 +37,7 @@ struct params
         offspring_size = o;
         diversification_prob = dprob;
         intensification_prob = iprob;
+        num_iter = n_iter;
     }
 };
 
@@ -51,6 +55,7 @@ class Variator
     int offspring_size;          // Number of offspring to be produced
     double diversification_prob; // Probability of diversification in crossover: in the [0.0, 1.0) interval
     double intensification_prob; // Probability of intensification in crossover: in the [0.0, 1.0) interval
+    int num_iter;                // Number of iterations of algorithm
 
     Variator(int n_f, int n_o, params &p, DistMatrix *dist, FlowMatrices *f)
     {
@@ -62,6 +67,7 @@ class Variator
         offspring_size = p.offspring_size;
         diversification_prob = p.diversification_prob;
         intensification_prob = p.intensification_prob;
+        num_iter = p.num_iter;
 
         distances = dist;
         flows = f;
@@ -72,6 +78,8 @@ class Variator
     void random_pop(vector<Individual*> &pop, vector<Individual*> &external_archive);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated, list<Individual*> &dominated);
+
+    int read_state(string &state_file);
     
 };
 

@@ -69,6 +69,7 @@ int main(int argc, char* argv[])
                            (e.g. no permission) this is an infinite loop */
      {
           state = read_flag(statefile);
+          printf("state = %d\n", state);
           
           if (state == 1) /* inital selection */
           {
@@ -105,7 +106,11 @@ int main(int argc, char* argv[])
                } /* else don't do anything and wait again */
           }
           
-          else if (state == 5) /* variator just terminated,
+          else if (st
+    
+    
+    
+    return OK;ate == 5) /* variator just terminated,
                                 here you can do what you want */
           {
                state = 6; /* e.g., terminate too */

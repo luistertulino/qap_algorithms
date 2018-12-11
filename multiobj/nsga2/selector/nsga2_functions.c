@@ -83,6 +83,9 @@ void initialize(char *paramfile, char *filenamebase)
     
     fclose(fp);
     
+    printf("seed = %d\n", seed);
+    printf("tournament = %d\n", tournament);
+
     srand(seed); /* seeding random number generator */
     
     sprintf(varfile, "%svar", filenamebase);
@@ -99,22 +102,26 @@ void initialize(char *paramfile, char *filenamebase)
     assert(strcmp(str, "alpha") == 0);
     fscanf(fp, "%d", &alpha);
     assert(alpha > 0);
+    printf("alpha = %d\n", alpha);
     
     fscanf(fp, "%s", str);
     assert(strcmp(str, "mu") == 0);
     fscanf(fp, "%d", &mu);
     assert(mu > 0);
+    printf("mu = %d\n", mu);
     
     fscanf(fp, "%s", str);
     assert(strcmp(str, "lambda") == 0);
     fscanf(fp, "%d", &lambda);
     assert(lambda > 0);
+    printf("lambda = %d\n", lambda);
     
     fscanf(fp, "%s", str);
     assert(strcmp(str, "dim") == 0);
     result = fscanf(fp, "%d", &dim);
     assert(result != EOF); /* no EOF, 'dim' correctly read */
     assert(dim > 0);
+    printf("dim = %d\n", dim);
     
     fclose(fp);
     

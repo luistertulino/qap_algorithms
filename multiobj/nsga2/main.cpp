@@ -67,7 +67,7 @@ int main(int argc, char const *argv[])
 
 void read_parameters(char const *argv[], params &p)
 {
-    std::stringstream strv2, strv3, strv4, strv5, strv6, strv7;
+    std::stringstream strv2, strv3, strv4, strv5, strv6, strv7, strv8;
 
     strv2 << argv[2];
     strv2 >> p.generated_solutions_num;
@@ -86,4 +86,7 @@ void read_parameters(char const *argv[], params &p)
 
     strv7 << argv[7];
     strv7 >> p.intensification_prob;
+
+    strv8 << argv[8];
+    strv8 >> p.num_iter;
 }

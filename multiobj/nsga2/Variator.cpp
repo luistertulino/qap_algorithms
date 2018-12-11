@@ -13,6 +13,10 @@
 
 #include <stdlib.h> // for system
 
+// For sleep
+#include <chrono>
+#include <thread>
+
 using std::swap;
 using std::vector;
 using std::list;
@@ -43,7 +47,6 @@ int Variator::init(vector<Individual*> &non_dominated)
     /* --------------------------------------------- */
     /* -------- SETUP SELECTOR ENVIRONMENT --------- */
     /* --------------------------------------------- */
-
     int result = set_env(population);
     if(result == ERROR_IN_FILE)
     {
@@ -51,11 +54,32 @@ int Variator::init(vector<Individual*> &non_dominated)
         return ERROR_IN_FILE;
     }
 
-    system("rm -r selector/env/");
-    return OK;
-    system("./selector/nsga2 nsga2_param.txt env/PISA_ 0.25");
+    system("./selector/nsga2 selector/env/nsga2_param.txt selector/env/PISA_ 0.25");
+    /* --------------------------------------------- */
+    /* ---------------- MAIN LOOP ------------------ */
+    /* --------------------------------------------- */
+    int state = 1;
+    for(int i = 0; i < num_iter; i++)
+    {
+        while(state != 2)
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(250));
+            state = read_state("selector/env/PISA_sta");
+            if(state == -1) return -1;            
+        }
+
+        /* Update population:
+            crie um novo array, new_population
+            remova da população anterior e dos filhos os indivíduos selecionados para a nova população e insira-os em new_population
+            para os indivíduos restantes:
+                destrua-os se não estiverem no arquivo externo
+            faça population = new_population
+        */
+
+        // Apply crossover and mutation on selected individuals
+    }
     
-    /* ------------ CONFIGURATIONS FILE ------------ */
+    system("rm -r selector/env/");
 
 }
 
@@ -263,4 +287,21 @@ bool Variator::update_nondom_set(Individual *ind,
     non_dominated.push_back(ind);
     ind->position_in_external_archive = last(non_dominated);
     return true;
+}
+
+int Variator::read_state(string &state_file)
+{
+    std::ifstream state;
+    state.open(state_file);
+    if(state.is_open())
+    {
+        int sta;
+        state >> sta;
+        return sta;
+    }
+    else
+    {
+        std::cerr << "Error in reading " << state_file << " in variator.\n";
+        return -1;
+    }
 }
