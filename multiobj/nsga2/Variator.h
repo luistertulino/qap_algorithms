@@ -1,14 +1,19 @@
 #ifndef VARIATOR_H_
 #define VARIATOR_H_
 
+#define ERROR_IN_FILE -100
+#define OK 0
+
 #include "Individual.h"
 
 #include <algorithm>
 #include <vector>
+#include <list>
 #include <iostream>
 
 using std::swap;
 using std::vector;
+using std::list;
 
 struct params
 {
@@ -18,6 +23,8 @@ struct params
     int offspring_size;          // Number of offspring to be produced
     double diversification_prob; // Probability of diversification in crossover: in the [0.0, 1.0) interval
     double intensification_prob; // Probability of intensification in crossover: in the [0.0, 1.0) interval
+
+    params(){}
 
     params(int gen, int pop, int p, int o, double dprob, double iprob)
     {
@@ -45,11 +52,13 @@ class Variator
     double diversification_prob; // Probability of diversification in crossover: in the [0.0, 1.0) interval
     double intensification_prob; // Probability of intensification in crossover: in the [0.0, 1.0) interval
 
-    Variator(params &p, DistMatrix *dist, FlowMatrices *f)
+    Variator(int n_f, int n_o, params &p, DistMatrix *dist, FlowMatrices *f)
     {
+        n_facs = n_f;
+        n_objs = n_o;
         generated_solutions_num = p.generated_solutions_num;
         pop_size = p.pop_size;
-        num_parents_num = p.parents_num;
+        num_parents = p.parents_num;
         offspring_size = p.offspring_size;
         diversification_prob = p.diversification_prob;
         intensification_prob = p.intensification_prob;
@@ -58,7 +67,8 @@ class Variator
         flows = f;
     }
 
-    void init(vector<Individual*> &non_dominated);
+    int init(vector<Individual*> &non_dominated);
+    int set_env(vector<Individual*> &population);
     void random_pop(vector<Individual*> &pop, vector<Individual*> &external_archive);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated, list<Individual*> &dominated);

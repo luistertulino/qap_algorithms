@@ -33,7 +33,7 @@ bool incomparable(Individual &ind1, Individual &ind2)
 }
 
 
-void Individual::randomize(std::mt19937 &gen, DistMatrix &dist_mat, FlowMatrices &flow_mats)
+void Individual::randomize(std::mt19937 &gen, DistMatrix &distances, FlowMatrices &flows)
 {
     for (int i = 0; i < n_facs; ++i)
         p[i] = i;
@@ -91,6 +91,7 @@ void Individual::compute_objs(DistMatrix &dist_mat, FlowMatrices &flow_mats)
 
 void Individual::print()
 {
+    std::cout << "\n-----------------------------------------------------------\n";
     std::cout << "Permutation: ";
     for (int i = 0; i < p.size(); ++i)
     {
@@ -101,12 +102,11 @@ void Individual::print()
     {
         std::cout << objs[i] << " ";
     }
-    std::cout << "\nlast_i = " << last_i << " last_j = " << last_j;
+    /*std::cout << "\nlast_i = " << last_i << " last_j = " << last_j;
     std::cout << "\ndeltas: ";
     for (int i = 0; i < deltas.size(); ++i)
     {
         std::cout << deltas[i] << " ";
-    }
+    }*/
     std::cout << "\n\n";
-    std::cout << "\n-----------------------------------------------------------\n";
 }

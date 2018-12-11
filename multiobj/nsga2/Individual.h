@@ -53,7 +53,7 @@ class Individual
         position_in_external_archive = index_in_population = CONSTRUCTED;
     }
 
-    void randomize(std::mt19937 &gen); // Generate a random permutation
+    void randomize(std::mt19937 &gen, DistMatrix &distances, FlowMatrices &flows); // Generate a random permutation
 
     /*------------------------------------------------------------*/
     /*---------------- OBJECTIVE FUNCTIONS METHODS ---------------*/

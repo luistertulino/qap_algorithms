@@ -3,23 +3,132 @@
 #include <algorithm>
 #include <vector>
 #include <list>
-#include <iostream>
+#include <string>
 #include <random>
+
+// For output and files
+#include <iostream>
+#include <sstream>
+#include <fstream>
+
+#include <stdlib.h> // for system
 
 using std::swap;
 using std::vector;
 using std::list;
+using std::string;
 
 std::random_device rand_dev;
 std::mt19937 gen(rand_dev());
 
-void Variator::init(vector<Individual*> &non_dominated)
+void print_population(vector<Individual*> &population)
+{
+    std::cout << "Print population:\n";
+    for(auto ind : population)
+    {
+        ind->print();
+    }
+    
+}
+
+int Variator::init(vector<Individual*> &non_dominated)
 {
     /* ---------------------------------------------*/
     /* --------- GENERATE RANDOM SOLUTIONS ---------*/
     /* ---------------------------------------------*/
     vector<Individual*> population, offspring;
     random_pop(population, non_dominated);
+    //print_population(population);
+
+    /* --------------------------------------------- */
+    /* -------- SETUP SELECTOR ENVIRONMENT --------- */
+    /* --------------------------------------------- */
+
+    int result = set_env(population);
+    if(result == ERROR_IN_FILE)
+    {
+        std::cerr << "Error in creating environment.\n";
+        return ERROR_IN_FILE;
+    }
+
+    system("rm -r selector/env/");
+    return OK;
+    system("./selector/nsga2 nsga2_param.txt env/PISA_ 0.25");
+    
+    /* ------------ CONFIGURATIONS FILE ------------ */
+
+}
+
+int Variator::set_env(vector<Individual*> &population)
+{
+    // Create environment folder and files
+    system("mkdir selector/env/");
+
+    std::ofstream cfg;
+    cfg.open("selector/env/PISA_cfg", std::ofstream::out);    
+    if (cfg.is_open())
+    {
+        cfg << "alpha " << pop_size << "\n";
+        cfg << "mu " << n_facs << "\n";
+        cfg << "lambda " << n_facs << "\n";
+        cfg << "dim " << n_objs << "\n";
+        cfg.close();
+    }
+    else
+    {
+        std::cerr << "Error in creating and opening selector/env/PISA_cfg file.\n";
+        return ERROR_IN_FILE;
+    }
+
+    std::ofstream params;
+    params.open("selector/env/nsga2_param.txt", std::ofstream::out);
+    if(params.is_open())
+    {
+        params << "seed " << gen() << "\n";
+        params << "tournament " << 2 << "\n";
+        params.close();
+    }
+    else
+    {
+        std::cerr << "Error in creating and opening selector/env/PISA_cfg file.\n";
+        return ERROR_IN_FILE;
+    }
+
+    std::ofstream ini;
+    ini.open("selector/env/PISA_ini", std::ofstream::out);
+    if(ini.is_open())
+    {
+        ini << (pop_size * (n_objs+1)) << "\n";
+        for(auto ind : population)
+        {
+            ini << ind->index_in_population << " ";            
+            for(int i = 0; i < n_objs; i++)
+                ini << ind->objs[i] << " ";
+            ini << "\n";            
+        }
+        ini << "END";
+        ini.close();
+    }
+    else
+    {
+        std::cerr << "Error in creating and opening selector/env/PISA_ini file.\n";
+        return ERROR_IN_FILE;
+    }
+
+    std::ofstream state;
+    state.open("selector/env/PISA_sta", std::ofstream::out);
+    if(state.is_open())
+    {
+        state << 1 << "\n";
+        state.close();
+    }
+    else
+    {
+        std::cerr << "Error in creating and opening selector/env/PISA_sta file.\n";
+        return ERROR_IN_FILE;
+    }
+
+    return OK;
 }
 
 void Variator::random_pop(vector<Individual*> &pop, vector<Individual*> &external_archive)
@@ -27,14 +136,24 @@ void Variator::random_pop(vector<Individual*> &pop, vector<Individual*> &externa
     list<Individual*> dominated;
     for (int i = 0; i < generated_solutions_num; ++i)
     {
+        //std::cout << "i = " << i << "\n";
         Individual *ind = new Individual(n_facs, n_objs);
         ind->randomize(gen, *distances, *flows);
+        //ind->print();
 
         if(not update_nondom_set(ind, external_archive, dominated) and ind->position_in_external_archive == NOT_IN_SET)
             // This solution was not inserted in archive because it is dominated
             dominated.push_back(ind);
     }
 
+    /* -----------------------------------
+       ------ CONSTRUCT POPULATION -------
+       -----------------------------------
+       Give priority to non-dominated solutions.
+       If the number of non-dominated solutions is less than or equal to the population size,
+       put those solutions in population and fill the remaning capacity with dominated solutions
+       Otherwise, just put the first pop_size solutions of the archive in population
+    */
     if(external_archive.size() <= pop_size)
     {
         pop = external_archive;        
@@ -74,8 +193,7 @@ void Variator::random_pop(vector<Individual*> &pop, vector<Individual*> &externa
             (*dom) = NULL;
             dom = dominated.erase(dom);
         }
-        else dom++;
-        
+        else dom++;        
     }
 }
 
