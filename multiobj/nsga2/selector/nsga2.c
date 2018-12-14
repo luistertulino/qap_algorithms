@@ -106,11 +106,7 @@ int main(int argc, char* argv[])
                } /* else don't do anything and wait again */
           }
           
-          else if (st
-    
-    
-    
-    return OK;ate == 5) /* variator just terminated,
+          else if (state == 5) /* variator just terminated,
                                 here you can do what you want */
           {
                state = 6; /* e.g., terminate too */

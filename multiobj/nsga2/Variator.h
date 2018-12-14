@@ -79,7 +79,16 @@ class Variator
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated);
     bool update_nondom_set(Individual *ind, vector<Individual*> &non_dominated, list<Individual*> &dominated);
 
+    void remove_individual(int position, vector<Individual*> set);
+
     int read_state(string &state_file);
+    int read_new_pop(string &arc_file, vector<Individual*> &new_pop, 
+                    vector<Individual*> &curr_pop, vector<Individual*> &curr_offspring);
+    int read_selected(string &sel_file, vector<Individual*> &selected);
+
+    int update_population(vector<Individual*> &new_pop, 
+                          vector<Individual*> &curr_pop, 
+                          vector<Individual*> &curr_offspring);
     
 };
 

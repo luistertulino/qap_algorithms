@@ -27,6 +27,7 @@ class Individual
     int position_in_external_archive;
     int index_in_population; /* Control variables. 
                                 If some of them is -1, then this individual is not in that set */
+    bool selected_to_new_pop = false;
 
     /*---------------------------------------------*/
     /*---------------- CONSTRUCTORS ---------------*/

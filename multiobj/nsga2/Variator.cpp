@@ -25,13 +25,14 @@ using std::string;
 std::random_device rand_dev;
 std::mt19937 gen(rand_dev());
 
+string state_path = "selector/env/PISA_sta";
+string arc_path = "selector/env/PISA_arc";
+string sel_path = "selector/env/PISA_sel";
+
 void print_population(vector<Individual*> &population)
 {
     std::cout << "Print population:\n";
-    for(auto ind : population)
-    {
-        ind->print();
-    }
+    for(auto ind : population) ind->print();
     
 }
 
@@ -64,7 +65,7 @@ int Variator::init(vector<Individual*> &non_dominated)
         while(state != 2)
         {
             std::this_thread::sleep_for(std::chrono::milliseconds(250));
-            state = read_state("selector/env/PISA_sta");
+            state = read_state(state_path);
             if(state == -1) return -1;            
         }
 
@@ -75,12 +76,35 @@ int Variator::init(vector<Individual*> &non_dominated)
                 destrua-os se não estiverem no arquivo externo
             faça population = new_population
         */
+        /* ----------- READ NEW POPULATION ----------- */
+        vector<Individual*> new_population;
+        result = read_new_pop(arc_path, new_population, population, offspring);
+        if(result == -1)
+        {
+            std::cerr << "Error in reading new population.\n";
+            return ERROR_IN_FILE;
+        }
 
+        /* ----------- UPDATE POPULATION ----------- */
+        update_population(new_population, population, offspring);
+            // After this method, new_population and offspring are empty
+
+        vector<int> selected_for_crossover;
+        read_selected(sel_path, selected_for_crossover, pop)
         // Apply crossover and mutation on selected individuals
     }
     
-    system("rm -r selector/env/");
+    //system("rm -r selector/env/");
 
+}
+
+void Variator::remove_individual(int position, vector<Individual*> &set)
+{
+    Individual *rem = set[i];
+    swap(set[i], set.back());
+    set.pop_back();
+    delete rem;
+    rem = NULL;
 }
 
 int Variator::set_env(vector<Individual*> &population)
@@ -93,8 +117,8 @@ int Variator::set_env(vector<Individual*> &population)
     if (cfg.is_open())
     {
         cfg << "alpha " << pop_size << "\n";
-        cfg << "mu " << n_facs << "\n";
-        cfg << "lambda " << n_facs << "\n";
+        cfg << "mu " << num_parents << "\n";
+        cfg << "lambda " << offspring_size << "\n";
         cfg << "dim " << n_objs << "\n";
         cfg.close();
     }
@@ -304,4 +328,97 @@ int Variator::read_state(string &state_file)
         std::cerr << "Error in reading " << state_file << " in variator.\n";
         return -1;
     }
+}
+
+int Variator::read_new_pop(string &arc_file, vector<Individual*> &new_pop, 
+                           vector<Individual*> &curr_pop, vector<Individual*> &curr_offspring)
+{
+    std::ifstream pop;
+    pop.open(arc_file);
+    if(not pop.is_open())
+    {
+        std::cerr << "Error in reading " << arc_file << " in variator.\n";
+        return -1;
+    }
+    int new_pop_size;
+    pop >> new_pop_size;    
+    if (new_pop_size != pop_size)
+    {
+        std::cerr << "Error in reading new_pop_size in " << arc_file << " in variator.\n";
+        return -1;
+    }
+    int new_pop_indexes[new_pop_size];    
+    for(int i = 0; i < pop_size; i++)
+        pop >> new_pop_indexes[i];
+    
+    string end; pop >> end;
+    if(end != "END")
+    {
+        std::cerr << "Error in reading END in " << arc_file << " in variator.\n";
+        return -1;
+    }
+        
+    for(int i = 0; i < new_pop_size; i++)
+    {        
+        if (new_pop_indexes[i] < pop_size)
+        {   // In this case, the individual selected to new population is in the current population
+            new_pop.push_back( curr_pop[ new_pop_indexes[i] ] );
+        }
+        else new_pop.push_back( curr_offspring[ new_pop_indexes[i] - pop_size ] );
+        new_pop[i]->selected_to_new_pop = true;
+    }
+    return OK;
+}
+
+int Variator::read_selected(string &sel_file, vector<int> &selected)
+{
+    std::ifstream sel;
+    sel.open(sel_file);
+    if(not sel.is_open())
+    {
+        std::cerr << "Error in reading " << sel_file << " in variator.\n";
+        return -1;
+    }
+    int num_sel; sel >> num_sel;
+    if(num_sel != num_parents)
+    {
+        std::cerr << "Error in reading num_parents in " << sel_file << " in variator.\n";
+        return -1;
+    }
+    selected.resize(num_sel);
+    for(int i = 0; i < num_sel; i++)
+        sel >> selected[i];
+    
+    string end; sel >> end;
+    if(end != "END")
+    {
+        std::cerr << "Error in reading END in " << sel_file << " in variator.\n";
+        return -1;
+    }
+    return OK;
+}
+
+int Variator::update_population(vector<Individual*> &new_pop, 
+                                vector<Individual*> &curr_pop, 
+                                vector<Individual*> &curr_offspring)
+{
+    for(int i = 0; i < curr_pop.size(); i++)
+    {
+        if(not curr_pop[i]->selected_to_new_pop and
+           curr_pop[i]->position_in_external_archive == NOT_IN_SET)
+            // This individual was not selected to new population and is not in external archive: delete it
+            remove_individual(i, curr_pop);
+    }
+    for(int i = 0; i < curr_offspring.size(); i++)
+    {
+        if(not curr_offspring[i]->selected_to_new_pop and
+           curr_offspring[i]->position_in_external_archive == NOT_IN_SET)
+            // This individual was not selected to new population and is not in external archive: delete it
+            remove_individual(i, curr_offspring);
+    }
+    
+    curr_pop.clear();
+    curr_pop = new_pop;
+    curr_offspring.clear();
+    new_pop.clear();
 }
